@@ -4,7 +4,7 @@ from tmtk.utils import pickle
 from itertools import izip
 from collections import defaultdict
 
-base_path = '/Users/ars/Dropbox/Projests/Python/PycharmProjects/tmtk/ad_hock/cowords'
+base_path = '/Users/ars/Dropbox/Projests/Python/PycharmProjects/tmtk/tmtk/ad_hock/cowords'
 
 collections = pickle.load('wiki_ru_featured_articles')
 
