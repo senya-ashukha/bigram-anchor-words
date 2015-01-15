@@ -4,12 +4,11 @@ from multiprocessing import Pool
 
 from collections import Counter, defaultdict
 from nltk.util import ngrams
-from nltk.corpus import stopwords
 from scipy.sparse import dok_matrix
 
 from tmtk.utils.iter import grouper, all_pairs
 from tmtk.utils.dict import dicts_sum
-from tmtk.utils.lingvo import doc_normalizer
+from tmtk.utils.lingvo import doc_normalizer, doc_stop_word_remove
 from tmtk.collection.collection import Collection
 
 class TransformerApplyer():
@@ -19,7 +18,7 @@ class TransformerApplyer():
 
     def apply(self, collections):
         for transformer in self.transformers:
-            if self.verbose:  print 'Train:\t\t' + str(transformer.__class__)
+            if self.verbose: print 'Train:\t\t' + str(transformer.__class__)
             transformer.train(collections)
 
             if self.verbose: print 'Apply:\t\t' + str(transformer.__class__)
@@ -33,6 +32,16 @@ class Transformer():
 
     def apply(self, collection):
         raise NotImplementedError
+
+class MultiThreadMapTransformApplyer():
+    def __init__(self, core=1):
+        self.core = core
+
+    def train(self, collection):
+        raise NotImplementedError('define self,map')
+
+    def apply(self, collection):
+        collection.documents = Pool(self.core).map(self.map, collection)
 
 class PunctuationRemoverTransform(Transformer):
     def train(self, collection):
@@ -55,17 +64,13 @@ class LoweCaseTransform(Transformer):
     def apply(self, collection):
         collection.documents = [[[word.lower() for word in sent] for sent in document] for document in collection]
 
-class WordNormalizerTransform(Transformer):
-    def __init__(self, core=1):
-        self.core = core
-
+class WordNormalizerTransform(MultiThreadMapTransformApplyer):
     def train(self, collection):
-        pass
+        self.map = doc_normalizer
 
-    def apply(self, collection):
-        if __name__ == '__main__':
-            mp_applyer = Pool(self.core)
-            collection.documents = mp_applyer.map(doc_normalizer, collection)
+class StopWordsRemoverTransform(MultiThreadMapTransformApplyer):
+    def train(self, collection):
+        self.map = doc_stop_word_remove
 
 class BigramExtractorDocumentsTransform(Transformer):
     def __init__(self, window_width=5, sigma=0.5, min_occur=1, min_word_len=3):
@@ -111,15 +116,6 @@ class BigramExtractorDocumentsTransform(Transformer):
             return new_document
 
         collection.documents = map(bigram_replace, enumerate(collection))
-
-class StopWordsRemoverTransform(Transformer):
-    def train(self, collection):
-        pass
-
-    def apply(self, collection):
-        stop = stopwords.words('english') + stopwords.words('russian')
-        collection.documents = [
-            [filter(lambda word: word not in stop, sent) for sent in document] for document in collection]
 
 class MemOptimizeTransform(Transformer):
     def train(self, collection):

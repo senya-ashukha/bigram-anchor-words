@@ -19,7 +19,7 @@ transformers = transformer.TransformerApplyer([
     transformer.PunctuationRemoverTransform(),
     transformer.LoweCaseTransform(),
     transformer.WordNormalizerTransform(core=3),
-    transformer.StopWordsRemoverTransform(),
+    transformer.StopWordsRemoverTransform(core=3),
     transformer.ShortSentRemoverTransform(),
     transformer.BigramExtractorDocumentsTransform(),
 
