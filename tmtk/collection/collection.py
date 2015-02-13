@@ -37,23 +37,10 @@ class Collection():
 
         return s.encode('utf-8')
 
-    def word_iter_generate(self):
+    def yield_str_documents(self):
         for document in self.documents:
-            for sent in document:
-                for word in sent:
-                    yield word
+            yield ' '.join([w for sent in document for w in sent])
 
-    @classmethod
-    def document_word_iter_generate(cls, document):
-        for sent in document:
-            for word in sent:
-                yield word
-
-    def voc(self, id_s=False):
-        if not self.words_map:
-            raise Exception('run mem optimize method.')
-
-        return self.words_map.values() if id_s else self.words_map.keys()
 
 class NLTKCollections(Collection):
     """
