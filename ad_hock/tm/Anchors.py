@@ -186,11 +186,11 @@ def constrS(x):
 def constrG(x):
     return x.sum() - np.abs(x).sum()
 
-c0 = np.zeros(100); c0.fill(1.0/100); 
+c0 = np.random.random(100); c0 /= c0.sum(); 
 
 def RecoverL2((Qw, Qanchors)):
     def L2(c): return sqrt(((Qw - np.dot(c.T, Qanchors))**2).sum())
-    c  = fmin_slsqp(L2, c0, f_eqcons=constrS, f_ieqcons=constrG, iter=20, iprint=-1)
+    c  = fmin_slsqp(L2, c0, f_eqcons=constrS, f_ieqcons=constrG, iter=10, iprint=-1)
     print L2(c0), L2(c)
     return c
 
