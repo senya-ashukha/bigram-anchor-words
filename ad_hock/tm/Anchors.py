@@ -25,7 +25,6 @@ from multiprocessing import Pool
 def prepr():
     infile = open('docword.nips.txt')
     num_docs, num_words, nnz = int(infile.readline()), int(infile.readline()), int(infile.readline())
-    K = 100
 
     M = scipy.sparse.lil_matrix((num_words, num_docs))
 
@@ -53,13 +52,6 @@ def prepr():
             if line.rstrip() in table:
                 remove_word[table[line.rstrip()]] = True
 
-    if M.shape[0] != numwords:
-        print 'Error: vocabulary file has different number of words', M.shape, numwords
-        sys.exit()
-        
-    print 'Number of words is ', numwords
-    print 'Number of documents is ', M.shape[1]
-
     M = M.tocsr()
 
     new_indptr = np.zeros(M.indptr.shape[0], dtype=np.int32)
@@ -67,18 +59,10 @@ def prepr():
     new_data = np.zeros(M.data.shape[0], dtype=np.float64)
 
     indptr_counter = 1
-    data_counter = 0
 
     for i in xrange(M.indptr.size - 1):
-
-        # if this is not a stopword
         if not remove_word[i]:
-
-            # start and end indices for row i
-            start = M.indptr[i]
-            end = M.indptr[i + 1]
-            
-            # if number of distinct documents that this word appears in is >= cutoff
+            start, end = M.indptr[i],  M.indptr[i + 1]
             if (end - start) >= cutoff:
                 new_indptr[indptr_counter] = new_indptr[indptr_counter-1] + end - start
                 new_data[new_indptr[indptr_counter-1]:new_indptr[indptr_counter]] = M.data[start:end]
@@ -94,10 +78,6 @@ def prepr():
     M = scipy.sparse.csr_matrix((new_data, new_indices, new_indptr))
     M = M.tocsc()
 
-    print 'New number of words is ', M.shape[0]
-    print 'New number of documents is ', M.shape[1]
-
-    # Output the new vocabulary
     output = open(output_vocab, 'w')
     row = 0
     with open(full_vocab, 'r') as f:
@@ -107,25 +87,13 @@ def prepr():
             row += 1
     output.close()
 
-
-    # In[4]:
-
-    print "identifying candidate anchors"
     candidate_anchors = []
 
     for i in xrange(M.shape[0]):
         if len(np.nonzero(M[i, :])[1]) > 100:
             candidate_anchors.append(i)
-    print len(candidate_anchors), "candidates"
 
-
-    # In[5]:
-
-    print output_vocab
-    vocab = open(output_vocab)
-    vocab = vocab.read()
-    vocab = vocab.strip()
-    vocab = vocab.split()
+    vocab = open(output_vocab).read().strip().split()
 
     return M, candidate_anchors, vocab
 
@@ -168,13 +136,9 @@ def Projection_Find(M_orig, r, candidates, dist=lambda x: np.dot(x, x)):
     return (anchor_words, list(anchor_indices))
 
 def findAnchors(Q, K, candidates):
-    row_sums = Q.sum(1)    
-    Q = (Q.transpose() / row_sums).transpose()
-
+    Q = (Q.transpose() / Q.sum(1)).transpose()
     Q_red = random_projection(Q.T).T
     anchors, anchor_indices = Projection_Find(Q_red, K, candidates)
-
-    Q = (Q.transpose() * row_sums).transpose()
 
     return anchor_indices
 
@@ -186,34 +150,38 @@ def constrS(x):
 def constrG(x):
     return x.sum() - np.abs(x).sum()
 
-c0 = np.random.random(100); c0 /= c0.sum(); 
+c0 = np.random.random(100); c0.fill(1./100);
 
+'''
 def RecoverL2((Qw, Qanchors)):
     def L2(c): return sqrt(((Qw - np.dot(c.T, Qanchors))**2).sum())
     c  = fmin_slsqp(L2, c0, f_eqcons=constrS, f_ieqcons=constrG, iter=10, iprint=-1)
     print L2(c0), L2(c)
     return c
+'''
+
+def RecoverL2(Qi, iter=40):
+    def fastL2(c):
+        return Qinorm - 2 * np.dot(c, Q1) + np.dot(c.T, np.dot(QQanc, c))
+
+    Qinorm = sqrt((Qi ** 2).sum())
+    Q1 = np.dot(Qanc, Qi.T)
+    return fmin_slsqp(fastL2, c0, f_eqcons=constrS, f_ieqcons=constrG, iter=iter, iprint=-1)
 
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(fillvalue=fillvalue, *args)
 
 def RecoverA(Q, anchors, n_jobs=4):
-    print 'RecoverA'
     V, K = Q.shape[0], len(anchors) 
     P_w = np.matrix(np.diag(np.dot(Q, np.ones(V))))
     Q = (Q.transpose() / Q.T.sum(1)).transpose()
 
-    A, pool= [], mp.Pool(n_jobs)
+    global Qanc, QQanc
+    Qanc = Q[anchors]
+    QQanc = np.dot(Qanc, Qanc.T)
 
-    def t():
-        for w in xrange(V): yield (Q[w], Q[anchors])
-
-    for args in grouper(t(), n_jobs*5):
-        A += pool.map(RecoverL2, args)
-
-    A = P_w * np.matrix(A)
-     
+    A = P_w * np.matrix(mp.Pool(n_jobs).map(RecoverL2, Q))
     return np.array(A / A.sum(0))
 
 if __name__ == "__main__":
