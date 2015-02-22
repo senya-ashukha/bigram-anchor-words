@@ -23,7 +23,7 @@ from multiprocessing import Pool
 
 #=================================================================================================
 def prepr():
-    infile = open('docword.nips.txt')
+    infile = open('./NIPS-collection/docword.nips.txt')
     num_docs, num_words, nnz = int(infile.readline()), int(infile.readline()), int(infile.readline())
 
     M = scipy.sparse.lil_matrix((num_words, num_docs))
@@ -32,8 +32,8 @@ def prepr():
         d, w, v = [int(x) for x in l.split()]
         M[w - 1, d - 1] = v
 
-    full_vocab = 'vocab.nips.txt'
-    output_matrix, output_vocab = 'M.trunc', 'V.trunc'
+    full_vocab = './NIPS-collection/vocab.nips.txt'
+    output_matrix, output_vocab = './NIPS-collection/M.trunc', './NIPS-collection/V.trunc'
 
     cutoff = 50
 
@@ -47,7 +47,7 @@ def prepr():
     remove_word = [False]*numwords
 
     # Read in the stopwords
-    with open('stopwords.txt', 'r') as file:
+    with open('./NIPS-collection/stopwords.txt', 'r') as file:
         for line in file:
             if line.rstrip() in table:
                 remove_word[table[line.rstrip()]] = True
@@ -107,9 +107,9 @@ def generate_Q_matrix(M):
         denom = column.sum() * (column.sum()-1)
         diag_M += column * 1.0 / denom
         column  /= sqrt(denom)
-    
+
     Q = (np.dot(M, M.T) - np.diag(diag_M)) / numdocs
-    
+
     return Q
 
 def random_projection(M, new_dim=1000):
@@ -118,21 +118,21 @@ def random_projection(M, new_dim=1000):
     R = np.reshape(math.sqrt(3)*R, (new_dim, old_dim))
     return np.dot(R, M)
 
-def gramm_shmit_step(M, basis, j, candidates, dist): 
+def gramm_shmit_step(M, basis, j, candidates, dist):
     max_dist_idx = candidates[np.argmax([dist(M[i]) for i in candidates])]
     if j >= 0: basis[j] = M[max_dist_idx]/np.sqrt(dist(M[max_dist_idx]))
-    
+
     return M[max_dist_idx], max_dist_idx
 
 def Projection_Find(M_orig, r, candidates, dist=lambda x: np.dot(x, x)):
-    dim, M = M_orig.shape[1], M_orig.copy()    
+    dim, M = M_orig.shape[1], M_orig.copy()
     anchor_words, anchor_indices, basis = np.zeros((r, dim)), np.zeros(r, dtype=np.int), np.zeros((r-1, dim))
-    
+
     for j in range(-1, r - 1):
         if j >= 0:
-            for i in candidates: M[i] -= anchor_words[0] if j == 0 else np.dot(M[i], basis[j-1]) * basis[j-1]    
+            for i in candidates: M[i] -= anchor_words[0] if j == 0 else np.dot(M[i], basis[j-1]) * basis[j-1]
         anchor_words[j+1], anchor_indices[j+1] = gramm_shmit_step(M, basis, j, candidates, dist)
-        
+
     return (anchor_words, list(anchor_indices))
 
 def findAnchors(Q, K, candidates):
@@ -143,22 +143,12 @@ def findAnchors(Q, K, candidates):
     return anchor_indices
 
 # sum(Ci) = 1
-def constrS(x):
-    return 1 - x.sum()
+def constrS(x): return 1 - x.sum()
 
 # Ci >= 0 i in [0, len(Ci)]
-def constrG(x):
-    return x.sum() - np.abs(x).sum()
+def constrG(x): return x.sum() - np.abs(x).sum()
 
-c0 = np.random.random(100); c0.fill(1./100);
-
-'''
-def RecoverL2((Qw, Qanchors)):
-    def L2(c): return sqrt(((Qw - np.dot(c.T, Qanchors))**2).sum())
-    c  = fmin_slsqp(L2, c0, f_eqcons=constrS, f_ieqcons=constrG, iter=10, iprint=-1)
-    print L2(c0), L2(c)
-    return c
-'''
+c0 = np.random.random(100); c0.fill(1. / 100);
 
 def RecoverL2(Qi, iter=40):
     def fastL2(c):
@@ -173,13 +163,12 @@ def grouper(iterable, n, fillvalue=None):
     return izip_longest(fillvalue=fillvalue, *args)
 
 def RecoverA(Q, anchors, n_jobs=4):
-    V, K = Q.shape[0], len(anchors) 
+    V, K = Q.shape[0], len(anchors)
     P_w = np.matrix(np.diag(np.dot(Q, np.ones(V))))
     Q = (Q.transpose() / Q.T.sum(1)).transpose()
 
     global Qanc, QQanc
-    Qanc = Q[anchors]
-    QQanc = np.dot(Qanc, Qanc.T)
+    Qanc, QQanc = Q[anchors], np.dot(Q[anchors], Q[anchors].T)
 
     A = P_w * np.matrix(mp.Pool(n_jobs).map(RecoverL2, Q))
     return np.array(A / A.sum(0))
@@ -193,6 +182,4 @@ if __name__ == "__main__":
     for k in xrange(len(anchors)):
         topwords = np.argsort(A[:, k])[-10:][::-1]
         print vocab[anchors[k]], ':',
-        for w in topwords:
-            print vocab[w],
-        print ""
+        print ' '.join([vocab[w] for w in topwords])
