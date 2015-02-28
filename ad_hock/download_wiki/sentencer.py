@@ -5,7 +5,7 @@ import os
 
 from defau.defaults import abbreviation
 
-base_dump_path = '/Users/ars/Dropbox/Projests/Python/PycharmProjects/tmtk/ad_hock/download_wiki/data/dumps'
+base_dump_path = '/Users/ars/Dropbox/Projests/Python/PycharmProjects/tmtk/ad_hock/download_wiki/documents_collection/dumps'
 
 topic_paths = glob.glob(os.path.join(base_dump_path, '*'))
 dot = u'.'

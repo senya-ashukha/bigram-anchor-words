@@ -160,5 +160,3 @@ class ShortSentRemoverTransform(Transformer):
 
     def apply(self, collection):
         collection.documents = [[sent for sent in document if len(sent) >= self.min_len] for document in collection]
-
-

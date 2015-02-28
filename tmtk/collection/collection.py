@@ -1,9 +1,10 @@
+import numpy as np
 from abc import abstractmethod
 
 class Collection():
     """
     in fill your must init:
-        raw_data - variable for your row data
+        raw_data - variable for your row documents_collection
         documents - list with list(documents) of list(sentences) of words
         collection_name - your collection name
 
@@ -20,29 +21,25 @@ class Collection():
         self.collection_name = collection_name
         self.raw_data = raw_data
 
-        self.documents = None
-        self.words_map = None
-        self.wc_mtx = None
+        self.documents_train = None
+        self.documents_test  = None
 
-    def __iter__(self):
-        for document in self.documents:
+    def iter_documents_train(self):
+        for document in self.documents_train:
             yield document
 
-    def __str__(self):
-        s = ''
-        for document in self.documents:
-            for sent in document:
-                s += u' '.join(sent) + '. '
-            s += '\n'
-
-        return s.encode('utf-8')
+    def iter_documents_test(self):
+        for document in self.documents_test:
+            yield document
 
     def yield_str_documents(self):
         for document in self.documents:
             yield ' '.join([w for sent in document for w in sent])
 
+    def bag_of_words(self):
+        raise NotImplementedError()
 
-class NLTKCollections(Collection):
+class FullTextCollection(Collection):
     """
         raw_date: is a nltk corpus.
     """
@@ -56,6 +53,31 @@ class NLTKCollections(Collection):
             self.doc_cat.append(category)
         self.raw_data = []
 
+    def bag_of_words(self):
+        def wc_mtx(docs):
+            return np.array([123])
+        vocab = None
+        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
+
+class BagOfWordsCollections(Collection):
+    """
+         raw_date: is a list of string(paths to documents files).
+    """
+
+    def fill(self):
+        self.documents = []
+        for doc_name in self.raw_data:
+            document = u' '.join(open(doc_name).readlines())
+            sentences = document.split(u'.')
+            sentences = [sentence.split() for sentence in sentences]
+            self.documents.append(sentences)
+
+    def bag_of_words(self):
+        def wc_mtx(docs):
+            return np.array([123])
+        vocab = None
+        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
+
 class StringCollections(Collection):
     """
         raw_date: is a list of string(document).
@@ -68,15 +90,8 @@ class StringCollections(Collection):
             sentences = [sentence.split() for sentence in sentences]
             self.documents.append(sentences)
 
-class FileCollections(Collection):
-    """
-         raw_date: is a list of string(paths to documents files).
-    """
-
-    def fill(self):
-        self.documents = []
-        for doc_name in self.raw_data:
-            document = u' '.join(open(doc_name).readlines())
-            sentences = document.split(u'.')
-            sentences = [sentence.split() for sentence in sentences]
-            self.documents.append(sentences)
+    def bag_of_words(self):
+        def wc_mtx(docs):
+            return np.array([123])
+        vocab = None
+        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
