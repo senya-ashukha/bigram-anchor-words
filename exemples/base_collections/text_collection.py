@@ -4,6 +4,15 @@ from tmtk.utils import pickle
 
 from tmtk.collection import transformer, collection
 
+def colect_str(collection):
+    s = ''
+    for document in collection.documents:
+        for sent in document:
+            s += u' '.join(sent) + '. '
+        s += '\n'
+    return s.encode('utf-8')
+
+
 raw_data = [
     u'Зайку бросила хозяйка. Под дождем остался зайка. Со скамейки слезть не мог, весь до ниточки промок.',
     u'Нас двое в комнате: собака моя и я. На дворе воет страшная, неистовая буря.',
@@ -31,5 +40,5 @@ transformers = transformer.TransformerApplyer([
 transformers.apply(collections)
 
 pickle.dump(collections)
-print pickle.load(collections.collection_name)
+print colect_str(pickle.load(collections.collection_name))
 

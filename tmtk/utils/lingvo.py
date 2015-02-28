@@ -33,3 +33,4 @@ def is_stop_words(w):
 
 def doc_stop_word_remove(document):
     return [filter(lambda word: not is_stop_words(word), sent) for sent in document]
+

@@ -4,7 +4,7 @@ import zipfile
 import cPickle as pickle
 from StringIO import StringIO
 
-pickle_data_path ='/Users/ars/Dropbox/Projests/Python/tmtk/data/pickle'
+pickle_data_path ='/Users/ars/Dropbox/Projests/Python/tmtk/documents_collection/pickle'
 
 def dump(collections):
     pickle_collection = StringIO()
