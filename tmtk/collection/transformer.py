@@ -1,74 +1,50 @@
 # -*- coding: utf-8 -*-
 
-from multiprocessing import Pool
-
 from collections import Counter, defaultdict
-from nltk.util import ngrams
-from scipy.sparse import dok_matrix
 
+from nltk.util import ngrams
+#from scipy.sparse import dok_matrix
+
+from tmtk.collection.transformer_api import *
 from tmtk.utils.iter import grouper, all_pairs
 from tmtk.utils.dict import dicts_sum
 from tmtk.utils.lingvo import doc_normalizer, doc_stop_word_remove
-from tmtk.collection.collection import Collection
 
-class TransformerApplyer():
-    def __init__(self, transformers, verbose=False):
-        self.transformers = transformers
-        self.verbose = verbose
-
-    def apply(self, collections):
-        for transformer in self.transformers:
-            if self.verbose: print 'Train:\t\t' + str(transformer.__class__)
-            transformer.train(collections)
-
-            if self.verbose: print 'Apply:\t\t' + str(transformer.__class__)
-            transformer.apply(collections)
-
-            if self.verbose: print 'Finished:\t' + str(transformer.__class__) + '\n'
-
-class Transformer():
-    def train(self, collection):
-        raise NotImplementedError
-
-    def apply(self, collection):
-        raise NotImplementedError
-
-class MultiThreadMapTransformApplyer():
-    def __init__(self, core=1):
-        self.core = core
-
-    def train(self, collection):
-        raise NotImplementedError('define self,map')
-
-    def apply(self, collection):
-        collection.documents = Pool(self.core).map(self.map, collection)
 
 class PunctuationRemoverTransform(Transformer):
     def train(self, collection):
         pass
 
     def apply(self, collection):
-        ru, en, digit, space = [u'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', u'ABCDEFGHIJKLMNOPQRSTUVWXYZ', u'0123456789',
-                                u' \t\n']
+        ru, en = u'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', u'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        digit, space = u'0123456789', u' \t\n'
         good_symbol = ru + ru.lower() + en + en.lower() + digit + space
 
         def filter_word(word):
             return u''.join(filter(lambda char: char in good_symbol, list(word)))
 
-        collection.documents = [[map(filter_word, sent) for sent in document] for document in collection]
+        collection.documents = [[map(filter_word, sent) for sent in document] for document in collection.documents]
 
 class LoweCaseTransform(Transformer):
     def train(self, collection):
         pass
 
     def apply(self, collection):
-        collection.documents = [[[word.lower() for word in sent] for sent in document] for document in collection]
+        collection.documents = [[[word.lower() for word in sent] for sent in document]
+                                for document in collection.documents]
 
-class WordNormalizerTransform(MultiThreadMapTransformApplyer):
+class EmptyWordRemoverTransform(Transformer):
+    def train(self, collection):
+        pass
+
+    def apply(self, collection):
+        collection.documents = [[filter(len, sent) for sent in document] for document in collection.documents]
+
+class WordNormalizerTransform(MultiThreadTransformer):
     def train(self, collection):
         self.map = doc_normalizer
 
-class StopWordsRemoverTransform(MultiThreadMapTransformApplyer):
+class StopWordsRemoverTransform(MultiThreadTransformer):
     def train(self, collection):
         self.map = doc_stop_word_remove
 
@@ -117,40 +93,6 @@ class BigramExtractorDocumentsTransform(Transformer):
 
         collection.documents = map(bigram_replace, enumerate(collection))
 
-class MemOptimizeTransform(Transformer):
-    def train(self, collection):
-        pass
-
-    def apply(self, collection):
-        if not collection.documents:
-            raise Exception('self.documents is None, fill your collection.')
-
-        collection.words_map, id_s = {}, 0
-
-        for document in collection.documents:
-            for sent in document:
-                for word in sent:
-                    if word not in collection.words_map:
-                        collection.words_map[word] = id_s
-                        id_s += 1
-
-class CreateWCMatrixTransform(Transformer):
-    def train(self, collection):
-        pass
-
-    def apply(self, collection):
-        mtx_class=dok_matrix
-        if not collection.words_map:
-            raise Exception('run mem optimize method.')
-
-        collection.wc_mtx = mtx_class((len(collection.documents), len(collection.words_map)))
-
-        for num_document, document in enumerate(collection.documents):
-            for sent in document:
-                for word in sent:
-                    if word not in document:
-                        collection.wc_mtx[num_document, collection.words_map[word]] += 1
-
 class ShortSentRemoverTransform(Transformer):
     def __init__(self, min_len=1):
         self.min_len = min_len
@@ -159,4 +101,5 @@ class ShortSentRemoverTransform(Transformer):
         pass
 
     def apply(self, collection):
-        collection.documents = [[sent for sent in document if len(sent) >= self.min_len] for document in collection]
+        collection.documents = [[sent for sent in document if len(sent) >= self.min_len]
+                                for document in collection.documents]
