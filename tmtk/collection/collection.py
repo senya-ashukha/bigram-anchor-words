@@ -1,97 +1,67 @@
-import numpy as np
-from abc import abstractmethod
+import os
+from tmtk.utils.iter import grouper
 
 class Collection():
-    """
-    in fill your must init:
-        raw_data - variable for your row documents_collection
-        documents - list with list(documents) of list(sentences) of words
-        collection_name - your collection name
-
-    automatic init:
-        words_map - map with {word: int_word_id}
-        wc_mtx    - sparse word count matrix
-    """
-
-    @abstractmethod
-    def fill(self):
-        pass
-
-    def __init__(self, collection_name, raw_data=None):
+    def __init__(self, collection_name, path, name):
         self.collection_name = collection_name
-        self.raw_data = raw_data
 
-        self.documents_train = None
-        self.documents_test  = None
+        self.path = path
+        self.name = name
 
-    def iter_documents_train(self):
-        for document in self.documents_train:
-            yield document
-
-    def iter_documents_test(self):
-        for document in self.documents_test:
-            yield document
-
-    def yield_str_documents(self):
-        for document in self.documents:
-            yield ' '.join([w for sent in document for w in sent])
-
-    def bag_of_words(self):
-        raise NotImplementedError()
-
-class FullTextCollection(Collection):
-    """
-        raw_date: is a nltk corpus.
-    """
+        self.documents, self.topics = [], []
+        self.topics_id, self.words_id = {}, {}
 
     def fill(self):
-        self.documents, self.doc_cat = [], []
-        for doc_name in self.raw_data.fileids():
-            sentences = self.raw_data.sents(doc_name)
-            self.documents.append(sentences)
-            category = self.raw_data.categories(doc_name)[0]
-            self.doc_cat.append(category)
-        self.raw_data = []
+        raise NotImplementedError
 
-    def bag_of_words(self):
-        def wc_mtx(docs):
-            return np.array([123])
-        vocab = None
-        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
+    def save(self):
+        raise NotImplementedError
 
 class BagOfWordsCollections(Collection):
-    """
-         raw_date: is a list of string(paths to documents files).
-    """
+    pass
 
+class FullTextCollection(Collection):
     def fill(self):
-        self.documents = []
-        for doc_name in self.raw_data:
-            document = u' '.join(open(doc_name).readlines())
-            sentences = document.split(u'.')
-            sentences = [sentence.split() for sentence in sentences]
-            self.documents.append(sentences)
+        col_nam, voc_name, top_name = self.name + '.txt', self.name + '.voc.txt', self.name + '.top.txt'
 
-    def bag_of_words(self):
-        def wc_mtx(docs):
-            return np.array([123])
-        vocab = None
-        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
+        col_nam = os.path.join(self.path, col_nam)
+        voc_name = os.path.join(self.path, voc_name)
+        top_name = os.path.join(self.path, top_name)
 
-class StringCollections(Collection):
-    """
-        raw_date: is a list of string(document).
-    """
+        self.documents, self.topics = [], []
 
-    def fill(self):
-        self.documents = []
-        for doc in self.raw_data:
-            sentences = filter(None, doc.split('.'))
-            sentences = [sentence.split() for sentence in sentences]
-            self.documents.append(sentences)
+        for id, topic, doc in grouper(open(col_nam), 3):
+            topic, doc = topic.decode('utf-8').strip(), doc.decode('utf-8').strip()
+            self.documents.append(map(lambda x: x.split(), doc.split('#')))
+            self.topics.append(topic)
 
-    def bag_of_words(self):
-        def wc_mtx(docs):
-            return np.array([123])
-        vocab = None
-        return wc_mtx(self.documents_train), wc_mtx(self.documents_test), vocab
+        self.id_to_topics = dict(enumerate(map(lambda x: x.decode('utf-8').strip(), open(top_name).readlines())))
+        self.topics_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_topics.iteritems()))
+
+        self.id_to_words = dict(enumerate(map(lambda x: x.decode('utf-8').strip(), open(voc_name).readlines())))
+        self.words_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
+
+        return self
+
+    def save(self):
+        col_nam, voc_name, top_name = self.name + '.txt', self.name + '.voc.txt', self.name + '.top.txt'
+        col_nam = os.path.join(self.path, col_nam)
+        voc_name = os.path.join(self.path, voc_name)
+        top_name = os.path.join(self.path, top_name)
+
+        str_doc = lambda doc: '#'.join([' '.join(map(str, sent)) for sent in doc])
+
+        f_out = open(col_nam, 'w')
+        for id, topic, doc in zip(xrange(len(self.documents)), self.topics, self.documents):
+            line = '%s\n%s\n%s\n' % (id, topic, str_doc(doc))
+            f_out.write(line.encode('utf-8'))
+
+        f_out = open(voc_name, 'w')
+        words = map(lambda x: x[1], sorted(self.id_to_words.iteritems(), key=lambda x: x[0]))
+        words = '\n'.join(words)
+        f_out.write(words.encode('utf-8'))
+
+        f_out = open(top_name, 'w')
+        words = map(lambda x: x[1], sorted(self.id_to_topics.iteritems(), key=lambda x: x[0]))
+        words = '\n'.join(words)
+        f_out.write(words.encode('utf-8'))
