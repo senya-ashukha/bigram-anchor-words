@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from tmtk.collection.collection import FullTextCollection
+from tmtk.collection.collection import BagOfWordsCollections
 
-collection = FullTextCollection(
-    collection_name='wiki_ru_article',
-    path='/home/oem/Dropbox/projests/Python/tmtk/tmtk/corpa/full_text/wiki_ru_article',
-    name='wiki_ru_article'
+collection_train = BagOfWordsCollections(
+    path='/home/oem/Dropbox/projests/Python/tmtk/tmtk/corpa/bag_of_words/nips',
+    name='nips_train'
 ).fill()
-collection.save()
+
