@@ -103,3 +103,23 @@ class ShortSentRemoverTransform(Transformer):
     def apply(self, collection):
         collection.documents = [[sent for sent in document if len(sent) >= self.min_len]
                                 for document in collection.documents]
+
+class TrashFilterTransform(Transformer):
+    def __init__(self, min_len=2, min_occ=30):
+        Transformer.__init__(self)
+        self.min_len = min_len
+        self.min_occ = min_occ
+        self.no_trash_wrds = None
+        self.map = lambda doc: [filter(lambda wrd: wrd in self.no_trash_wrds, sent) for sent in doc]
+
+    def train(self, collection):
+        coll = Counter([wrd for doc in collection.documents for sent in doc for wrd in sent])
+
+        self.no_trash_wrds = dict(
+            filter(lambda x: x[1] > self.min_occ and len(collection.id_to_words[x[0]]) > self.min_len, coll.items())
+        )
+
+        print len(self.no_trash_wrds)
+
+    def apply(self, collection):
+        collection.documents = map(self.map, collection.documents)
