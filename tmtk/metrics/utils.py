@@ -25,11 +25,15 @@ def estimate_teta(F, documents_test, num_topics=100):
 
     estimate_doc, control_doc = half_random(documents_test)
 
-    for d in range(doc_count):
+    for d in xrange(doc_count):
         for w, wrd_count in estimate_doc[d]:
             teta.T[d] += (F[w] * wrd_count)
 
+    for i in xrange(teta.shape[0]):
+        for j in xrange(teta.shape[1]):
+            if teta[i, j] == 0:
+                teta[i, j] = 0.1 ** 5
+
     for row in teta.T:
         row /= row.sum()
-
     return teta, control_doc

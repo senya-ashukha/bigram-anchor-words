@@ -4,6 +4,9 @@
       <w>bigram</w>
       <w>bigramm</w>
       <w>denom</w>
+      <w>diag</w>
+      <w>preplexity</w>
+      <w>wrds</w>
     </words>
   </dictionary>
 </component>
