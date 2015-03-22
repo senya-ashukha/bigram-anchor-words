@@ -30,20 +30,27 @@ class BagOfWordsCollections(Collection):
 
         cur_doc, cur_doc_id = [], 0
 
-        for line in open(self.col_nam):
-            doc_id, wrd, wrd_count = line.split()
+        col = open(self.col_nam)
+
+        self.num_wrd = int(col.readline())
+
+        for line in col:
+            doc_id, wrd, wrd_count = map(int, line.split())
             if doc_id != cur_doc_id:
                 self.documents.append(cur_doc)
                 cur_doc = []
                 cur_doc_id = doc_id
-            cur_doc.append((wrd, wrd_count))
+            cur_doc.append((wrd-1, wrd_count))
 
+        if cur_doc:
+            self.documents.append(cur_doc)
         self.documents = np.array(self.documents)
 
         self.id_to_words = dict(
             enumerate(map(lambda x: x.decode('utf-8').strip(), open(self.voc_name).readlines())))
         self.words_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
 
+        print 'load', self.col_nam.split('/')[-1], 'num_docs', len(self.documents), 'num_wrds', self.num_wrd
         return self
 
     def save(self):
