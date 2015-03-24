@@ -3,8 +3,8 @@ import numpy as np
 from operator import itemgetter
 from tmtk.utils.math import norn_mtx
 
-def plsa_model(documents_train, documents_test, num_topics=100, num_iter=10, metric=None, verbose=False):
-    doc_count, wrd_count = len(documents_train), 12420 #todo
+def plsa_model(documents_train, documents_test, wrd_count, num_topics=100, num_iter=10, metric=None, verbose=False):
+    doc_count = len(documents_train)
     F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
 
     for itter in xrange(num_iter):

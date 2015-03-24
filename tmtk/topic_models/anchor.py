@@ -4,8 +4,8 @@ import numpy as np
 from copy import copy
 from scipy import sparse
 
-def m_matrix(documents):
-    doc_count, wrd_count = len(documents), 12419#TODO
+def m_matrix(documents, wrd_count):
+    doc_count = len(documents)
     m_mtx = sparse.lil_matrix((wrd_count, doc_count-1), dtype=np.float64)
 
     for num_doc, doc in enumerate(documents):
@@ -201,8 +201,8 @@ def find_candidate(m_mtx, k=120):
 
     return candidate_anchors
 
-def anchor_model(documents_train, documents_test, num_topics=100, metric=None, verbose=False):
-    m_mtx = m_matrix(documents_train)
+def anchor_model(documents_train, documents_test, wrd_count, num_topics=100, metric=None, verbose=False):
+    m_mtx = m_matrix(documents_train, wrd_count)
     cov_matrix = topic_cov_mtx(m_mtx)
     candidate_anchors = find_candidate(m_mtx)
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
