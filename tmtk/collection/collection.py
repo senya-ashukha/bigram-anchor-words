@@ -24,7 +24,7 @@ class BagOfWordsCollections(Collection):
         self.voc_name = os.path.join(self.path, '_'.join(self.name.split('_')[:-1]) + '.voc.txt')
         self.top_name = os.path.join(self.path, self.name + '.top.txt')
 
-    def fill(self):
+    def fill(self, firs_wrd_num=0):
         self.documents = []
         self.topics = None
 
@@ -40,7 +40,7 @@ class BagOfWordsCollections(Collection):
                 self.documents.append(cur_doc)
                 cur_doc = []
                 cur_doc_id = doc_id
-            cur_doc.append((wrd-1, wrd_count))
+            cur_doc.append((wrd-firs_wrd_num, wrd_count))
 
         if cur_doc:
             self.documents.append(cur_doc)
