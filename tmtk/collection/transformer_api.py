@@ -26,12 +26,14 @@ class TransformerChainApply():
         self.transformers = transformers
         self.verbose = verbose
 
-    def apply(self, collections):
+    def apply(self, collection):
         for transformer in self.transformers:
             if self.verbose: print 'Train:\t\t' + str(transformer.__class__)
-            transformer.train(collections)
+            transformer.train(collection)
 
             if self.verbose: print 'Apply:\t\t' + str(transformer.__class__)
-            transformer.apply(collections)
+            transformer.apply(collection)
 
             if self.verbose: print 'Finished:\t' + str(transformer.__class__) + '\n'
+
+        return collection

@@ -1,6 +1,7 @@
 import os
 import numpy as np
 
+from collections import Counter
 from tmtk.utils.iter import grouper
 
 class Collection():
@@ -105,3 +106,10 @@ class FullTextCollection(Collection):
         words = map(lambda x: x[1], sorted(self.id_to_topics.iteritems(), key=lambda x: x[0]))
         words = '\n'.join(words)
         f_out.write(words.encode('utf-8'))
+
+def bag_of_words(collection):
+    bw_collection = []
+    for doc in collection.documents:
+        bw_doc = Counter([wrd for sent in doc for wrd in sent]).items()
+        bw_collection.append(bw_doc)
+    return np.array(bw_collection)
