@@ -1,10 +1,14 @@
 import numpy as np
 
-from operator import itemgetter
+from utils import get_topic
 from tmtk.utils.math import norn_mtx
 
-def plsa_model(documents_train, documents_test, wrd_count, num_topics=100, num_iter=10, metric=None, verbose=False):
-    doc_count = len(documents_train)
+from tmtk.collection.collection import bag_of_words
+
+def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False):
+    bw_train, bw_test = bag_of_words(train), bag_of_words(test)
+
+    doc_count = len(bw_train)
     F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
 
     for itter in xrange(num_iter):
@@ -12,7 +16,7 @@ def plsa_model(documents_train, documents_test, wrd_count, num_topics=100, num_i
         Nt, Nd = np.zeros(num_topics), np.zeros(doc_count)
 
         for d in xrange(doc_count):
-            for w, ndw in documents_train[d]:
+            for w, ndw in bw_train[d]:
                 ndwt = F[w, :] * T[:, d]
                 ndwt *= ndw * (1.0 / ndwt.sum())
 
@@ -27,22 +31,18 @@ def plsa_model(documents_train, documents_test, wrd_count, num_topics=100, num_i
         for t in range(num_topics):
             T[t] = Ntd[t] / Nd
 
-        if metric and verbose:
-            metric_val = metric(F, documents_train, documents_test)
-            print 'iter %s: %s' % (itter, metric_val)
+        print itter
 
-    if metric:
-        metric_val = metric(F, documents_train, documents_test)
-        print 'end: %s' % metric_val
+        if metrics and verbose and itter % 2 == 1:
+            metric_val = [metric(F, train, test) for metric in metrics]
+            print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
+
+    if metrics:
+        metric_val = [metric(F, train, test) for metric in metrics]
+        print 'end: %s' % ' '.join(metric_val)
 
     return F, T
 
-def print_topics(F, id_to_wrd, top=8):
-    for i, column in enumerate(F.T):
-        col = list(enumerate(column))
-        col = map(itemgetter(0), sorted(col, key=itemgetter(1), reverse=True)[:top])
-        col = 'Topic %s: ' % i + ' '.join(map(lambda x: id_to_wrd[x], col))
-
-        print col
-
-
+def print_topics(F, id_to_wrd, top=9):
+    for i in xrange(F.shape[1]):
+        print 'Topic %s: ' % i + ' '.join(map(lambda x: id_to_wrd[x], get_topic(F, i, top)))

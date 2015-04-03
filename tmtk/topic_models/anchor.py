@@ -4,6 +4,8 @@ import numpy as np
 from copy import copy
 from scipy import sparse
 
+from tmtk.collection.collection import bag_of_words
+
 def m_matrix(documents, wrd_count):
     doc_count = len(documents)
     m_mtx = sparse.lil_matrix((wrd_count, doc_count-1), dtype=np.float64)
@@ -55,10 +57,10 @@ def topic_cov_mtx(m_mtx):
 
     return Q
 
-def random_projection(mtx, new_dim=1000):
+def random_projection(mtx, new_dim=1100):
     old_dim = mtx.shape[0]
     r_mtx = np.searchsorted(
-        np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.RandomState(100).random_sample(new_dim * old_dim)) - 1
+        np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
     r_mtx = np.reshape(math.sqrt(3) * r_mtx, (new_dim, old_dim))
     return np.dot(r_mtx, mtx)
 
@@ -192,7 +194,7 @@ def recover_word_topic(cov_mtx, anchors):
     A = np.matrix(np.diag(P_w)) * np.matrix(map(RecoverL2, cov_mtx))
     return np.array(A / A.sum(0))
 
-def find_candidate(m_mtx, k=120):
+def find_candidate(m_mtx, k=70):
     candidate_anchors = []
 
     for i in xrange(m_mtx.shape[0]):
@@ -201,15 +203,17 @@ def find_candidate(m_mtx, k=120):
 
     return candidate_anchors
 
-def anchor_model(documents_train, documents_test, wrd_count, num_topics=100, metric=None, verbose=False):
-    m_mtx = m_matrix(documents_train, wrd_count)
+def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=False):
+    bw_train, bw_test = bag_of_words(train), bag_of_words(test)
+
+    m_mtx = m_matrix(bw_train, wrd_count)
     cov_matrix = topic_cov_mtx(m_mtx)
     candidate_anchors = find_candidate(m_mtx)
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
     word_topic = recover_word_topic(cov_matrix, anchors)
-    if metric:
-        metric_val = metric(word_topic, documents_train, documents_test)
-        print 'end: %s' % metric_val
+    if metrics:
+        metric_val = [metric(word_topic, train, test) for metric in metrics]
+        print 'end: %s' % ' '.join(metric_val)
 
     return word_topic, anchors
 
