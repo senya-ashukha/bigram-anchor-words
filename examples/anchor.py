@@ -7,12 +7,12 @@ from tmtk.collection.transformer_api import TransformerChainApply
 from tmtk.collection.transformer import BigramExtractorDocumentsTransform
 
 collection_train = FullTextCollection(
-    path='/home/oem/Dropbox/projests/Python/tmtk/tmtk/corpa/full_text/wiki_ru_article',
+    path='/home/aashuha/bac_degr/tmtk/tmtk/corpa/full_text/wiki_ru_article',
     name='wiki_ru_article_train'
 ).fill()
 
 collection_test = FullTextCollection(
-    path='/home/oem/Dropbox/projests/Python/tmtk/tmtk/corpa/full_text/wiki_ru_article',
+    path='/home/aashuha/bac_degr/tmtk/tmtk/corpa/full_text/wiki_ru_article',
     name='wiki_ru_article_test'
 ).fill()
 
