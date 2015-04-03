@@ -194,7 +194,7 @@ def recover_word_topic(cov_mtx, anchors):
     A = np.matrix(np.diag(P_w)) * np.matrix(map(RecoverL2, cov_mtx))
     return np.array(A / A.sum(0))
 
-def find_candidate(m_mtx, k=70):
+def find_candidate(m_mtx, k=10):
     candidate_anchors = []
 
     for i in xrange(m_mtx.shape[0]):
