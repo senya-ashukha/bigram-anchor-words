@@ -203,12 +203,18 @@ def find_candidate(m_mtx, k=10):
 
     return candidate_anchors
 
+def find_bigr_candidate(train):
+    wrds = filter(lambda x: isinstance(x, tuple), train.words_to_id.keys())
+    wrds = map(lambda x: train.words_to_id[x], wrds)
+    return wrds
+
 def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=False):
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
+    candidate_anchors = find_candidate(train)
 
     m_mtx = m_matrix(bw_train, wrd_count)
     cov_matrix = topic_cov_mtx(m_mtx)
-    candidate_anchors = find_candidate(m_mtx)
+    #candidate_anchors = find_candidate(m_mtx)
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
     word_topic = recover_word_topic(cov_matrix, anchors)
     if metrics:
