@@ -1,115 +1,48 @@
 import os
+import zipfile
 import numpy as np
+
+from string import split
+from itertools import izip, imap
 
 from collections import Counter
 from tmtk.utils.iter import grouper
 
 class Collection():
-    def __init__(self, path, name):
+    def __init__(self, path):
         self.path = path
-        self.name = name
 
-        self.documents, self.topics = [], []
-        self.topics_id, self.words_id = {}, {}
+        self.documents_train = list()
+        self.documents_test  = list()
+
+        self.id_to_words = dict()
+        self.words_to_id = dict()
 
     def fill(self):
         raise NotImplementedError
 
     def save(self):
         raise NotImplementedError
-
-class BagOfWordsCollections(Collection):
-    def __init__(self, path, name):
-        Collection.__init__(self, path, name)
-        self.col_nam = os.path.join(self.path, self.name + '.txt')
-        self.voc_name = os.path.join(self.path, '_'.join(self.name.split('_')[:-1]) + '.voc.txt')
-        self.top_name = os.path.join(self.path, self.name + '.top.txt')
-
-    def fill(self, firs_wrd_num=0):
-        self.documents = []
-        self.topics = None
-
-        cur_doc, cur_doc_id = [], 0
-
-        col = open(self.col_nam)
-
-        self.num_wrd = int(col.readline())
-
-        for line in col:
-            doc_id, wrd, wrd_count = map(int, line.split())
-            if doc_id != cur_doc_id:
-                self.documents.append(cur_doc)
-                cur_doc = []
-                cur_doc_id = doc_id
-            cur_doc.append((wrd-firs_wrd_num, wrd_count))
-
-        if cur_doc:
-            self.documents.append(cur_doc)
-        self.documents = np.array(self.documents)
-
-        self.id_to_words = dict(
-            enumerate(map(lambda x: x.decode('utf-8').strip(), open(self.voc_name).readlines())))
-        self.words_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
-
-        print 'load', self.col_nam.split('/')[-1], 'num_docs', len(self.documents), 'num_wrds', self.num_wrd
-        return self
-
-    def save(self):
-        f_out = open(self.col_nam, 'w')
-        for id, doc in enumerate(self.documents):
-            for wrd, count in doc:
-                f_out.write((u'%s %s %s\n' % (id, wrd, count)).encode('utf-8'))
-
-        self.id_to_words = dict(
-            enumerate(map(lambda x: x.decode('utf-8').strip(), open(self.voc_name).readlines())))
-        self.words_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
 
 class FullTextCollection(Collection):
-    def __init__(self, path, name):
-        Collection.__init__(self, path, name)
-        self.col_nam = os.path.join(self.path, self.name + '.txt')
-        self.voc_name = os.path.join(self.path, '_'.join(self.name.split('_')[:-1]) + '.voc.txt')
-        self.top_name = os.path.join(self.path, self.name + '.top.txt')
-
     def fill(self):
-        self.documents, self.topics = [], []
+        zf = zipfile.ZipFile(self.path)
 
-        for id, topic, doc in grouper(open(self.col_nam), 3):
-            topic, doc = topic.decode('utf-8').strip(), doc.decode('utf-8').strip()
-            self.documents.append(map(lambda x: map(int, x.split()), doc.split('#')))
-            self.topics.append(topic)
+        if not zf.namelist() == ['test.txt', 'train.txt', 'vocab.txt']:
+            raise Exception('Collection arch must be contain only this files: test.txt, train.txt, vocab.txt')
 
-        self.id_to_topics = dict(
-            enumerate(map(lambda x: x.decode('utf-8').strip(), open(self.top_name).readlines())))
-        self.topics_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_topics.iteritems()))
+        for text_id, doc in grouper(zf.open('train.txt'), 2):
+            self.documents_train.append(map(int, doc.decode('utf-8').strip().split()))
 
-        self.id_to_words = dict(
-            enumerate(map(lambda x: x.decode('utf-8').strip(), open(self.voc_name).readlines())))
-        self.words_to_id = dict(map(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
+        for text_id, doc in grouper(zf.open('test.txt'), 2):
+            self.documents_test.append(map(int, doc.decode('utf-8').strip().split()))
+
+        self.id_to_words = dict(filter(len, imap(split, zf.open('vocab.txt').read().decode('utf8').split('\n'))))
+        self.id_to_words = dict(zip(map(int, self.id_to_words.keys()), self.id_to_words.values()))
+        self.words_to_id = dict(imap(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
 
         return self
 
-    def save(self):
-        str_doc = lambda doc: '#'.join([' '.join(map(str, sent)) for sent in doc])
-
-        f_out = open(self.col_nam, 'w')
-        for id, topic, doc in zip(xrange(len(self.documents)), self.topics, self.documents):
-            line = '%s\n%s\n%s\n' % (id, topic, str_doc(doc))
-            f_out.write(line.encode('utf-8'))
-
-        f_out = open(self.voc_name, 'w')
-        words = map(lambda x: x[1], sorted(self.id_to_words.iteritems(), key=lambda x: x[0]))
-        words = '\n'.join(words)
-        f_out.write(words.encode('utf-8'))
-
-        f_out = open(self.top_name, 'w')
-        words = map(lambda x: x[1], sorted(self.id_to_topics.iteritems(), key=lambda x: x[0]))
-        words = '\n'.join(words)
-        f_out.write(words.encode('utf-8'))
-
-def bag_of_words(collection):
-    bw_collection = []
-    for doc in collection.documents:
-        bw_doc = Counter([wrd for sent in doc for wrd in sent]).items()
-        bw_collection.append(bw_doc)
+def bag_of_words(documents):
+    bw_collection = [Counter([wrd for wrd in doc]).items() for doc in documents]
     return np.array(bw_collection)

@@ -16,7 +16,7 @@ class MultiThreadTransformer():
         self.map = None
 
     def train(self, collection):
-        raise NotImplementedError('define self,map')
+        raise NotImplementedError('define self.map')
 
     def apply(self, collection):
         collection.documents = Pool(self.core).map(self.map, collection.documents)
