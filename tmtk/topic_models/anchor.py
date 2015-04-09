@@ -223,6 +223,8 @@ def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=F
     return word_topic, anchors
 
 def print_topics(F, id_to_wrd, anch, top=8):
+    import ipdb
+    ipdb.set_trace()
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
         print id_to_wrd[anch[k]], ':',
