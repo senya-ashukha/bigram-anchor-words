@@ -43,7 +43,6 @@ def eval_words_for_probs(word_topic, top):
     return words
 
 def eval_pob_bigrams(docs, num_wrds, words_for_probs, wind_with=10):
-    docs = [[wrd for sent in doc for wrd in sent] for doc in docs]
     cond_probs = defaultdict(lambda: np.zeros(num_wrds))
 
     for doc in docs:
@@ -61,7 +60,7 @@ def eval_pob_bigrams(docs, num_wrds, words_for_probs, wind_with=10):
     return cond_probs
 
 def eval_pob_ungrams(docs, words_for_probs):
-    prob_words = Counter([wrd for doc in docs for sent in doc for wrd in sent])
+    prob_words = Counter([wrd for doc in docs for wrd in doc])
     prob_words = dict_normalize(prob_words)
     return prob_words
 
@@ -75,8 +74,8 @@ def all_combine(words):
 
 def coherence(word_topic, train, test, top=10, window_with=10):
     words_for_probs = set(eval_words_for_probs(word_topic, top))
-    prob_ungrams = eval_pob_ungrams(train.documents, words_for_probs)
-    prob_conditn = eval_pob_bigrams(train.documents, word_topic.shape[0], words_for_probs, wind_with=window_with)
+    prob_ungrams = eval_pob_ungrams(train, words_for_probs)
+    prob_conditn = eval_pob_bigrams(train, word_topic.shape[0], words_for_probs, wind_with=window_with)
 
     pmi = lambda w1, w2: math.log(prob_conditn[w2][w1] / prob_ungrams[w1]) if prob_conditn[w2][w1] != 0.0 else 0.0
     pmis = []

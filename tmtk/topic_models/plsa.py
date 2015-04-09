@@ -5,6 +5,8 @@ from tmtk.utils.math import norn_mtx
 
 from tmtk.collection.collection import bag_of_words
 
+import sys
+
 def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False):
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
 
