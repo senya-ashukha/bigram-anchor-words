@@ -21,6 +21,6 @@ collection_test = transformers[0].apply(collection_test)
 F, T = plsa.plsa_model(collection.documents_train, collection.documents_test,
                        wrd_count=len(collection.id_to_words),
                        metrics=[preplexity, coherence, uniq_top_of_topics],
-                       num_iter=2, verbose=False)
+                       num_iter=40, verbose=False)
 
 plsa.print_topics(F, collection.id_to_words)
