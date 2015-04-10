@@ -57,7 +57,7 @@ def topic_cov_mtx(m_mtx):
 
     return Q
 
-def random_projection(mtx, new_dim=1100):
+def random_projection(mtx, new_dim=1000):
     old_dim = mtx.shape[0]
     r_mtx = np.searchsorted(
         np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
@@ -223,9 +223,7 @@ def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=F
     return word_topic, anchors
 
 def print_topics(F, id_to_wrd, anch, top=8):
-    import ipdb
-    ipdb.set_trace()
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
         print id_to_wrd[anch[k]], ':',
-        print ' '.join([id_to_wrd[w] for w in topwords])
+        print ' '.join([id_to_wrd[w] for w in topwords]).strip()
