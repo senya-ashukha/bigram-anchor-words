@@ -12,7 +12,7 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
 
     doc_count = len(bw_train)
 
-    if not F:
+    if F is None:
         F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
     else:
         T = estimate_teta_full(F, bw_train)
