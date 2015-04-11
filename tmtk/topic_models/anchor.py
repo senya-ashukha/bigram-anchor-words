@@ -227,4 +227,4 @@ def print_topics(F, id_to_wrd, anch, top=8):
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
         print id_to_wrd[anch[k]], ':',
-        print ' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip()
+        print ' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip().encode('utf8')
