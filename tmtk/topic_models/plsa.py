@@ -51,4 +51,4 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
 
 def print_topics(F, id_to_wrd, top=9):
     for i in xrange(F.shape[1]):
-        print 'Topic %s: ' % i + ' '.join(map(lambda x: id_to_wrd[x], get_topic(F, i, top)))
+        print 'Topic %s: ' % i + ' '.join(map(lambda x: id_to_wrd[x], get_topic(F, i, top))).encode('utf-8')
