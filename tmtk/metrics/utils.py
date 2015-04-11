@@ -37,3 +37,20 @@ def estimate_teta(F, documents_test, num_topics=100):
     for row in teta.T:
         row /= row.sum()
     return teta, control_doc
+
+def estimate_teta_full(F, documents, num_topics=100):
+    doc_count = len(documents)
+    teta = np.zeros((num_topics, doc_count))
+
+    for d in xrange(doc_count):
+        for w, wrd_count in documents[d]:
+            teta.T[d] += (F[w] * wrd_count)
+
+    for i in xrange(teta.shape[0]):
+        for j in xrange(teta.shape[1]):
+            if teta[i, j] == 0:
+                teta[i, j] = 1e-5
+
+    for row in teta.T:
+        row /= row.sum()
+    return teta

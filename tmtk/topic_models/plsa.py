@@ -5,13 +5,17 @@ from tmtk.utils.math import norn_mtx
 
 from tmtk.collection.collection import bag_of_words
 
-import sys
+from tmtk.metrics.utils import estimate_teta_full
 
-def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False):
+def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False, F=None):
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
 
     doc_count = len(bw_train)
-    F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
+
+    if not F:
+        F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
+    else:
+        T = estimate_teta_full(F, bw_train)
 
     for itter in xrange(num_iter):
         Nwt, Ntd = np.zeros((wrd_count, num_topics)), np.zeros((num_topics, doc_count))
