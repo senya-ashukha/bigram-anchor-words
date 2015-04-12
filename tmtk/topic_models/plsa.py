@@ -10,11 +10,11 @@ from tmtk.collection.collection import bag_of_words
 
 logger = get_logger()
 
-def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False, F=None):
+def plsa_model(collection, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False, F=None):
     logger.info('Start plsa_model')
 
     logger.info('Create bag of words')
-    bw_train, bw_test = bag_of_words(train), bag_of_words(test)
+    bw_train, bw_test = bag_of_words(collection.documents_train), bag_of_words(collection.documents_test)
 
     doc_count = len(bw_train)
     if F is None:
@@ -48,7 +48,7 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
 
         if metrics and verbose:
             if itter % 2 == 1:
-                metric_val = [metric(F, train, test) for metric in metrics]
+                metric_val = [metric(F, collection.documents_train, collection.documents_test) for metric in metrics]
                 print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
         else:
             bar.next()
@@ -58,7 +58,7 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
 
     if metrics:
         logger.info('Eval metrics')
-        metric_val = [metric(F, train, test) for metric in metrics]
+        metric_val = [metric(F, collection.documents_train, collection.documents_test) for metric in metrics]
         print 'end: %s' % ' '.join(metric_val)
 
     return F, T
