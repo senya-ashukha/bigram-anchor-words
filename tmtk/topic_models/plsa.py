@@ -22,9 +22,10 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
     else:
         T = estimate_teta_full(F, bw_train)
 
-    bar = Bar('Processing', max=num_iter)
-    logger.info('Begin itters')
+    if not(metrics and verbose):
+        bar = Bar('Processing', max=num_iter)
 
+    logger.info('Begin itters')
     for itter in xrange(num_iter):
         Nwt, Ntd = np.zeros((wrd_count, num_topics)), np.zeros((num_topics, doc_count))
         Nt, Nd = np.zeros(num_topics), np.zeros(doc_count)
@@ -45,12 +46,15 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
         for t in range(num_topics):
             T[t] = Ntd[t] / Nd
 
-        if metrics and verbose and itter % 2 == 1:
-            metric_val = [metric(F, train, test) for metric in metrics]
-            print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
+        if metrics and verbose:
+            if itter % 2 == 1:
+                metric_val = [metric(F, train, test) for metric in metrics]
+                print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
+        else:
+            bar.next()
 
-        bar.next()
-    bar.finish()
+    if not(metrics and verbose):
+        bar.finish()
 
     if metrics:
         logger.info('Eval metrics')
