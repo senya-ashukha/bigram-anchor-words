@@ -263,7 +263,7 @@ def print_topics(F, id_to_wrd, anch, top=8):
         topwords = np.argsort(F[:, k])[-top:][::-1]
 
         cmd = '{anch}: {topic}'
-        cmd.format(
+        cmd = cmd.format(
             anch=id_to_wrd[anch[k]].encode('utf8'),
             topic=' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip().encode('utf8'))
 
