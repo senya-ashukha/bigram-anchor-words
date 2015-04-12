@@ -241,7 +241,8 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 
     logger.info('Find anch words candidat')
     #candidate_anchors = find_candidate(m_mtx)
-    candidate_anchors = find_bigr_candidate(collection)
+    candidate_anchors = find_bigr_candidate(collection) + find_candidate(m_mtx)
+
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
