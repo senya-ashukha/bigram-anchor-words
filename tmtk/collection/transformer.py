@@ -51,7 +51,7 @@ class StopWordsRemoverTransform(MultiThreadTransformer):
         self.map = doc_stop_word_remove
 
 class BigramExtractorDocumentsTransform(Transformer):
-    def __init__(self, window_width=5, sigma=0.5, min_occur=1, min_word_len=3, top=3000):
+    def __init__(self, window_width=5, sigma=0.5, min_occur=1, min_word_len=3, top=1000):
         Transformer.__init__(self)
         self.window_width = window_width
         self.sigma = sigma
@@ -63,8 +63,8 @@ class BigramExtractorDocumentsTransform(Transformer):
         bigrams = dict()
         collocation_measure = lambda coloc: counts_neighbors[coloc] * 1.0 / counts_windows[coloc]
 
-        for i, document in enumerate(collection.documents):
-            groups_words = grouper([wrd for sent in document for wrd in sent], 5)
+        for i, document in enumerate(collection.documents_train+collection.documents_test):
+            groups_words = grouper([wrd for wrd in document], 5)
             counts_neighbors = defaultdict(lambda: 0)
             counts_windows = defaultdict(lambda: 0)
 
@@ -77,17 +77,18 @@ class BigramExtractorDocumentsTransform(Transformer):
 
             buf = []
             for item in counts_neighbors:
-                if collocation_measure(item) > self.sigma and counts_neighbors[item] > self.min_occur and item[0] != item[1]:
-                    buf.append((item, (collocation_measure(item), counts_neighbors[item])))
+                if collocation_measure(item) > self.sigma and counts_neighbors[item] > self.min_occur:
+                    if item[0] != item[1]:
+                        buf.append((item, (collocation_measure(item), counts_neighbors[item])))
 
             bigrams[i] = dict(buf)
 
         collection.bigrams = []
-        for i in xrange(len(collection.documents)):
+        for i in xrange(len(collection.documents_train+collection.documents_test)):
             collection.bigrams += bigrams[i].keys()
         collection.bigrams = set(collection.bigrams)
 
-        documents = [wrd for document in collection.documents for sent in document for wrd in sent]
+        documents = [wrd for document in collection.documents_train+collection.documents_test for wrd in document]
         bigrams = filter(lambda bigr: bigr in collection.bigrams, ngrams(documents, 2))
         collection.bigrams = dict(sorted(Counter(bigrams).items(), key=itemgetter(1), reverse=True)[:self.top])
 
@@ -99,25 +100,25 @@ class BigramExtractorDocumentsTransform(Transformer):
             collection.id_to_words[max_v] = collection.id_to_words[bigram[0]] + '_' + collection.id_to_words[bigram[1]]
             max_v += 1
 
-        new_documents = []
-        for document in collection.documents:
-            new_document = []
-            for sent in document:
-                bigrams = ngrams(sent, 2)
-                f = 1
-                new_sent = []
+        def apply_for_docs(docs):
+            new_documents = []
+            for document in docs:
+                new_document = []
+                bigrams, use_next_wrd = ngrams(document, 2), True
                 for bigram in bigrams:
-                    if f:
+                    if use_next_wrd:
                         if bigram in collection.bigrams:
-                            new_sent.append(collection.words_to_id[bigram])
-                            f = 0
+                            new_document.append(collection.words_to_id[bigram])
+                            use_next_wrd = False
                         else:
-                            new_sent.append(bigram[0])
+                            new_document.append(bigram[0])
                     else:
-                        f = 1
-                new_document.append(new_sent)
-            new_documents.append(new_document)
-        collection.documents = new_documents
+                        use_next_wrd = True
+                new_documents.append(new_document)
+            return new_documents
+
+        collection.documents_train = apply_for_docs(collection.documents_train)
+        collection.documents_test = apply_for_docs(collection.documents_test)
 
         return collection
 

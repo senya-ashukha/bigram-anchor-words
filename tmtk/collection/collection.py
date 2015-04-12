@@ -1,6 +1,7 @@
 import os
 import zipfile
 import numpy as np
+from operator import itemgetter
 
 from string import split
 from itertools import izip, imap
@@ -46,3 +47,7 @@ class FullTextCollection(Collection):
 def bag_of_words(documents):
     bw_collection = [Counter([wrd for wrd in doc]).items() for doc in documents]
     return np.array(bw_collection)
+
+def print_bigrams(collection, top=10):
+    idx = sorted(collection.bigrams.items(), key=itemgetter(1), reverse=True)[:top]
+    for i, c in idx: print collection.id_to_words[collection.words_to_id[i]], c
