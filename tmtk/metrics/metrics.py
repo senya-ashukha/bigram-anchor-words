@@ -14,8 +14,7 @@ def _preplexity(word_topic, topic_document, documents):
         for w, ndw in documents[d]:
             Pwd = np.dot(word_topic[w, :], topic_document[:, d])
             lh += ndw * math.log(Pwd if Pwd > 0 else 1e-5)
-    return math.e ** (-lh / sum([
-        sum([ndw for _, ndw in documents[d]]) for d in xrange(doc_count)]))
+    return math.e ** (-lh / sum([sum([ndw for _, ndw in documents[d]]) for d in xrange(doc_count)]))
 
 def preplexity(word_topic, train, test):
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
