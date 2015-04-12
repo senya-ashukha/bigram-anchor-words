@@ -228,6 +228,8 @@ def find_bigr_candidate(train):
     return wrds
 
 def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=False):
+    logger.info('Start anchor_model')
+
     logger.info('Create bag of words')
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
 
