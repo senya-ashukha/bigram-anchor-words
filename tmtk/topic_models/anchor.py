@@ -261,5 +261,10 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 def print_topics(F, id_to_wrd, anch, top=8):
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
-        print id_to_wrd[anch[k]].encode('utf8'), ':',
-        print ' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip().encode('utf8')
+
+        cmd = '{anch}: {topic}'
+        cmd.format(
+            anch=id_to_wrd[anch[k]].encode('utf8'),
+            topic=' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip().encode('utf8'))
+
+        print cmd
