@@ -89,8 +89,13 @@ def projection_find(m_mtx, r, candidates, dist=lambda x: np.dot(x, x)):
     return list(anchor_indices)
 
 def find_anchors(cov_mtx, candidates, num_topics=100):
+    logger.info('find_anchors >> cov_mtx row_normolized')
     cov_mtx = row_normolized(copy(cov_mtx))
+
+    logger.info('find_anchors >> cov_mtx_red random_projection')
     cov_mtx_red = random_projection(cov_mtx.T).T
+
+    logger.info('find_anchors >> find projection')
     anchor_indices = projection_find(cov_mtx_red, num_topics, candidates)
 
     return anchor_indices
