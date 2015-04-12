@@ -1,11 +1,11 @@
 import math
 import numpy as np
 
-
 from copy import copy
 from scipy import sparse
 from string import strip
 
+from multiprocessing import Pool
 from tmtk.collection.collection import bag_of_words
 from tmtk.utils.logger import get_logger
 
@@ -63,18 +63,15 @@ def topic_cov_mtx(m_mtx):
     return Q
 
 def random_projection(mtx, new_dim=1000):
-    from scipy import sparse
     old_dim = mtx.shape[0]
     r_mtx = np.searchsorted(
         np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
     r_mtx = np.reshape(math.sqrt(3) * r_mtx, (new_dim, old_dim))
-    #return np.dot(r_mtx, mtx)
 
     r_mtx = sparse.csr_matrix(r_mtx)
     mtx = sparse.csc_matrix(mtx)
 
-    m = r_mtx.dot(mtx)
-    return m.toarray()
+    return r_mtx.dot(mtx).toarray()
 
 def gram_shmidt_step(m_mtx, basis, j, candidates, dist):
     max_dist_idx = candidates[np.argmax(
@@ -200,7 +197,7 @@ def RecoverL2(y):
 
     return alpha
 
-def recover_word_topic(cov_mtx, anchors):
+def recover_word_topic(cov_mtx, anchors, n_jobs=8):
     V, K = cov_mtx.shape[0], len(anchors)
     P_w = np.dot(cov_mtx, np.ones(V))
     row_normolized(cov_mtx)
@@ -208,7 +205,7 @@ def recover_word_topic(cov_mtx, anchors):
     global x, XX
     x, XX = cov_mtx[anchors], np.dot(cov_mtx[anchors], cov_mtx[anchors].T)
 
-    A = np.matrix(np.diag(P_w)) * np.matrix(map(RecoverL2, cov_mtx))
+    A = np.matrix(np.diag(P_w)) * np.matrix(Pool(n_jobs).map(RecoverL2, cov_mtx))
     return np.array(A / A.sum(0))
 
 def find_candidate(m_mtx, k=500):
