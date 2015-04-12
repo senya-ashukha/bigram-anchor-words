@@ -22,6 +22,6 @@ F, T = plsa.plsa_model(
     collection,
     wrd_count=len(collection.id_to_words),
     metrics=[preplexity, coherence, uniq_top_of_topics],
-    num_iter=15, verbose=False, F=F)
+    num_iter=40, verbose=False, F=F)
 
 plsa.print_topics(F, collection.id_to_words)
