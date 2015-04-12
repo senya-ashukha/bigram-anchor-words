@@ -1,10 +1,15 @@
 import math
 import numpy as np
 
+
 from copy import copy
 from scipy import sparse
+from string import strip
 
 from tmtk.collection.collection import bag_of_words
+from tmtk.utils.logger import get_logger
+
+logger = get_logger()
 
 def m_matrix(documents, wrd_count):
     doc_count = len(documents)
@@ -209,21 +214,32 @@ def find_bigr_candidate(train):
     return wrds
 
 def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=False):
+    logger.info('Create bag of words')
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
 
+    logger.info('Build word x documents matrix')
     m_mtx = m_matrix(bw_train, wrd_count)
+
+    logger.info('Build cov matrix')
     cov_matrix = topic_cov_mtx(m_mtx)
+
+    logger.info('Find anch words candidat')
     candidate_anchors = find_candidate(m_mtx)
+
+    logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
+
+    logger.info('Recover word x topic matrix')
     word_topic = recover_word_topic(cov_matrix, anchors)
+
     if metrics:
+        logger.info('Eval metrics')
         metric_val = [metric(word_topic, train, test) for metric in metrics]
         print 'end: %s' % ' '.join(metric_val)
 
     return word_topic, anchors
 
 def print_topics(F, id_to_wrd, anch, top=8):
-    from string import strip
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
         print id_to_wrd[anch[k]].encode('utf8'), ':',
