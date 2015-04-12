@@ -63,13 +63,14 @@ def topic_cov_mtx(m_mtx):
     return Q
 
 def random_projection(mtx, new_dim=1000):
+    from scipy import sparse
     old_dim = mtx.shape[0]
     r_mtx = np.searchsorted(
         np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
     r_mtx = np.reshape(math.sqrt(3) * r_mtx, (new_dim, old_dim))
-    import ipdb
-    ipdb.set_trace()
-    return np.dot(r_mtx, mtx)
+    #return np.dot(r_mtx, mtx)
+    m = sparse.csr_matrix(r_mtx).multiply(sparse.csc_matrix(mtx))
+    return m.toarray()
 
 def gram_shmidt_step(m_mtx, basis, j, candidates, dist):
     max_dist_idx = candidates[np.argmax(
