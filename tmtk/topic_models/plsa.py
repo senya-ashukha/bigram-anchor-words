@@ -1,21 +1,29 @@
 import numpy as np
 
 from utils import get_topic
-from tmtk.utils.math import norn_mtx
+from progress.bar import Bar
 
+from tmtk.utils.math import norn_mtx
+from tmtk.utils.logger import get_logger
+from tmtk.metrics.utils import estimate_teta_full
 from tmtk.collection.collection import bag_of_words
 
-from tmtk.metrics.utils import estimate_teta_full
+logger = get_logger()
 
 def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None, verbose=False, F=None):
+    logger.info('Start plsa_model')
+
+    logger.info('Create bag of words')
     bw_train, bw_test = bag_of_words(train), bag_of_words(test)
 
     doc_count = len(bw_train)
-
     if F is None:
         F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
     else:
         T = estimate_teta_full(F, bw_train)
+
+    bar = Bar('Processing', max=num_iter)
+    logger.info('Begin itters')
 
     for itter in xrange(num_iter):
         Nwt, Ntd = np.zeros((wrd_count, num_topics)), np.zeros((num_topics, doc_count))
@@ -37,13 +45,15 @@ def plsa_model(train, test, wrd_count, num_topics=100, num_iter=10, metrics=None
         for t in range(num_topics):
             T[t] = Ntd[t] / Nd
 
-        print itter
-
         if metrics and verbose and itter % 2 == 1:
             metric_val = [metric(F, train, test) for metric in metrics]
             print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
 
+        bar.next()
+    bar.finish()
+
     if metrics:
+        logger.info('Eval metrics')
         metric_val = [metric(F, train, test) for metric in metrics]
         print 'end: %s' % ' '.join(metric_val)
 
