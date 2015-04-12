@@ -12,7 +12,7 @@ transformers = TransformerChainApply(transformers=[BigramExtractorDocumentsTrans
 collection = transformers.apply(collection)
 
 F, anc = anchor.anchor_model(
-    collectionW,
+    collection,
     wrd_count=len(collection.id_to_words),
     metrics=[preplexity, coherence, uniq_top_of_topics])
 
