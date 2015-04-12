@@ -227,11 +227,11 @@ def find_bigr_candidate(train):
     wrds = map(lambda x: train.words_to_id[x], wrds)
     return wrds
 
-def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=False):
+def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False):
     logger.info('Start anchor_model')
 
     logger.info('Create bag of words')
-    bw_train, bw_test = bag_of_words(train), bag_of_words(test)
+    bw_train, bw_test = bag_of_words(collection.documents_train), bag_of_words(collection.documents_test)
 
     logger.info('Build word x documents matrix')
     m_mtx = m_matrix(bw_train, wrd_count)
@@ -241,7 +241,7 @@ def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=F
 
     logger.info('Find anch words candidat')
     #candidate_anchors = find_candidate(m_mtx)
-    candidate_anchors = find_bigr_candidate(train)
+    candidate_anchors = find_bigr_candidate(collection.documents_train)
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
@@ -251,7 +251,7 @@ def anchor_model(train, test, wrd_count, num_topics=100, metrics=None, verbose=F
 
     if metrics:
         logger.info('Eval metrics')
-        metric_val = [metric(word_topic, train, test) for metric in metrics]
+        metric_val = [metric(word_topic, collection.documents_train, collection.documents_test) for metric in metrics]
         print 'end: %s' % ' '.join(metric_val)
 
     return word_topic, anchors
