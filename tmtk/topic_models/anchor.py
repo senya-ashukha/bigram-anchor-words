@@ -67,6 +67,8 @@ def random_projection(mtx, new_dim=1000):
     r_mtx = np.searchsorted(
         np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
     r_mtx = np.reshape(math.sqrt(3) * r_mtx, (new_dim, old_dim))
+    import ipdb
+    ipdb.set_trace()
     return np.dot(r_mtx, mtx)
 
 def gram_shmidt_step(m_mtx, basis, j, candidates, dist):
