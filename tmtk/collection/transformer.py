@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from operator import itemgetter
 from collections import Counter, defaultdict
 
 from nltk.util import ngrams
-#from scipy.sparse import dok_matrix
 
-from tmtk.collection.transformer_api import *
 from tmtk.utils.iter import grouper, all_pairs
 from tmtk.utils.dict import dicts_sum
 from tmtk.utils.lingvo import doc_normalizer, doc_stop_word_remove
-
-from operator import itemgetter
-
+from tmtk.collection.transformer_api import Transformer, MultiThreadTransformer
 
 class PunctuationRemoverTransform(Transformer):
     def train(self, collection):
@@ -121,6 +118,10 @@ class BigramExtractorDocumentsTransform(Transformer):
         collection.documents_test = apply_for_docs(collection.documents_test)
 
         return collection
+
+class BigrammFindler(BigramExtractorDocumentsTransform):
+    def apply(self, collection):
+        pass
 
 class ShortSentRemoverTransform(Transformer):
     def __init__(self, min_len=1):

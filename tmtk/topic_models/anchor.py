@@ -240,10 +240,7 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     cov_matrix = topic_cov_mtx(m_mtx)
 
     logger.info('Find anch words candidat')
-    #candidate_anchors = find_candidate(m_mtx)
     candidate_anchors = find_bigr_candidate(collection) + find_candidate(m_mtx)
-    candidate_anchors = list(set(candidate_anchors))
-    np.random.shuffle(candidate_anchors)
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
@@ -258,13 +255,15 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 
     return word_topic, anchors
 
-def print_topics(F, id_to_wrd, anch, top=8):
+def print_topics(F, id_to_wrd, anch, fname, top=8):
+    f = open(fname, 'w')
+
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
-
-        cmd = '{anch}: {topic}'
+        cmd = '{anch}:\n  {topic}\n'
         cmd = cmd.format(
             anch=id_to_wrd[anch[k]].encode('utf8'),
             topic=' '.join(map(strip, [id_to_wrd[w] for w in topwords])).strip().encode('utf8'))
+        f.write(cmd)
 
-        print cmd
+    f.close()
