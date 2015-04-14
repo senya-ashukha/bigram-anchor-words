@@ -85,6 +85,7 @@ def coherence(word_topic, train, test, top=10, window_with=10):
         pmi_t = np.median(pmi_t)
         pmis.append(pmi_t)
 
+    print pmis
     return 'coherence = %.2f' % np.median(pmis)
 
 def uniq_top_of_topics(word_topic, train, test, top=10):
