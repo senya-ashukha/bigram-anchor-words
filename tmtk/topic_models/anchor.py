@@ -65,7 +65,7 @@ def topic_cov_mtx(m_mtx):
 def random_projection(mtx, new_dim=1000):
     old_dim = mtx.shape[0]
     r_mtx = np.searchsorted(
-        np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.random_sample(new_dim * old_dim)) - 1
+        np.cumsum([1.0/6, 2.0/3, 1.0/6]), np.random.RandomState(100).random_sample(new_dim * old_dim)) - 1
     r_mtx = np.reshape(math.sqrt(3) * r_mtx, (new_dim, old_dim))
 
     r_mtx = sparse.csr_matrix(r_mtx)
