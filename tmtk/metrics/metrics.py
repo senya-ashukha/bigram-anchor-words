@@ -79,6 +79,9 @@ def coherence(word_topic, train, test, top=10, window_with=10):
     pmi = lambda w1, w2: math.log(prob_conditn[w2][w1] / prob_ungrams[w1]) if prob_conditn[w2][w1] != 0.0 else 0.0
     pmis = []
 
+    import ipdb
+    ipdb.set_trace()
+
     for t in xrange(word_topic.shape[1]):
         topic_wrds = get_topic(word_topic, topic=t, head=top)
         pmi_t = [pmi(w1, w2) for w1, w2 in all_combine(topic_wrds) if pmi(w1, w2) != 0.0]
