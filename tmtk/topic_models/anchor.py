@@ -223,10 +223,10 @@ def find_candidate(m_mtx, collection, k=400):
         if len(np.nonzero(m_mtx[i, :])[1]) > k:
             candidate_anchors.append(i)
 
-    '''candidate_anchors = filter(
+    candidate_anchors = filter(
         lambda w: morph.parse(collection.id_to_words(w))[0].tag.POS == u'NOUN',
         candidate_anchors)
-    '''
+    
 
     return candidate_anchors
 
