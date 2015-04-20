@@ -10,7 +10,7 @@ F, anc = anchor.anchor_model(
     wrd_count=len(collection.id_to_words),
     metrics=[preplexity, coherence, uniq_top_of_topics])
 
-anchor.print_topics(F, collection.id_to_words, anc, 'anch.txt')
+anchor.print_topics(F, collection.id_to_words, anc, 'wn_anch.txt')
 
 F, T = plsa.plsa_model(
     collection,
@@ -18,4 +18,4 @@ F, T = plsa.plsa_model(
     metrics=[preplexity, coherence, uniq_top_of_topics],
     num_iter=40, verbose=False, F=F)
 
-plsa.print_topics(F, collection.id_to_words, 'anch_plsa.txt')
+plsa.print_topics(F, collection.id_to_words, 'wn_anch_plsa.txt')
