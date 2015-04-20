@@ -17,6 +17,7 @@ def plsa_model(collection, wrd_count, num_topics=100, num_iter=10, metrics=None,
     bw_train, bw_test = bag_of_words(collection.documents_train), bag_of_words(collection.documents_test)
 
     doc_count = len(bw_train)
+
     if F is None:
         F, T = norn_mtx(wrd_count, num_topics, axis='x'), norn_mtx(num_topics, doc_count, axis='y')
     else:

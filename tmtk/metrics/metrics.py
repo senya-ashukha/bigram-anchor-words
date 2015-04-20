@@ -85,7 +85,6 @@ def coherence(word_topic, train, test, top=10, window_with=10):
         pmi_t = np.mean(pmi_t)
         pmis.append(pmi_t)
 
-    print pmis
     return 'coherence = %.2f' % np.mean(pmis)
 
 def topic_coherence(tpoic, n_words, train, window_with=10):
