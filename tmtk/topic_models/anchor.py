@@ -227,12 +227,13 @@ def find_candidate(m_mtx, collection, k=400):
         lambda w: morph.parse(collection.id_to_words[w])[0].tag.POS == u'NOUN',
         candidate_anchors)
     '''
-    
+
     return candidate_anchors
 
-def find_bigr_candidate(m_mtx, collection):
+def find_bigr_candidate(m_mtx, collection, k=60):
     wrds = filter(lambda x: isinstance(x, tuple), collection.words_to_id.keys())
     wrds = map(lambda x: collection.words_to_id[x], wrds)
+    wrds = filter(lambda i: len(np.nonzero(m_mtx[i, :])[1]) > k, wrds)
     return wrds
 
 def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False):
@@ -249,7 +250,7 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 
     logger.info('Find anch words candidat')
     candidate_anchors = find_candidate(m_mtx, collection)
-    #candidate_anchors += find_bigr_candidate(m_mtx, collection)
+    candidate_anchors += find_bigr_candidate(m_mtx, collection)
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
