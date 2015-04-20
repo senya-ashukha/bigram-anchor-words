@@ -1,10 +1,9 @@
-import os
 import zipfile
 import numpy as np
 from operator import itemgetter
 
 from string import split
-from itertools import izip, imap
+from itertools import imap
 
 from collections import Counter
 from tmtk.utils.iter import grouper

@@ -9,6 +9,9 @@ from multiprocessing import Pool
 from tmtk.collection.collection import bag_of_words
 from tmtk.utils.logger import get_logger
 
+import pymorphy2
+morph = pymorphy2.MorphAnalyzer()
+
 logger = get_logger()
 
 def m_matrix(documents, wrd_count):
@@ -213,18 +216,23 @@ def recover_word_topic(cov_mtx, anchors, n_jobs=8):
     A = np.matrix(np.diag(P_w)) * A
     return np.array(A / A.sum(0))
 
-def find_candidate(m_mtx, k=100):
+def find_candidate(m_mtx, collection, k=100):
     candidate_anchors = []
 
     for i in xrange(m_mtx.shape[0]):
         if len(np.nonzero(m_mtx[i, :])[1]) > k:
             candidate_anchors.append(i)
 
+    '''candidate_anchors = filter(
+        lambda w: morph.parse(collection.id_to_words(w))[0].tag.POS == u'NOUN',
+        candidate_anchors)
+    '''
+    
     return candidate_anchors
 
-def find_bigr_candidate(train):
-    wrds = filter(lambda x: isinstance(x, tuple), train.words_to_id.keys())
-    wrds = map(lambda x: train.words_to_id[x], wrds)
+def find_bigr_candidate(m_mtx, collection):
+    wrds = filter(lambda x: isinstance(x, tuple), collection.words_to_id.keys())
+    wrds = map(lambda x: collection.words_to_id[x], wrds)
     return wrds
 
 def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False):
@@ -240,7 +248,8 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     cov_matrix = topic_cov_mtx(m_mtx)
 
     logger.info('Find anch words candidat')
-    candidate_anchors = find_bigr_candidate(collection) + find_candidate(m_mtx)
+    candidate_anchors = find_candidate(m_mtx, collection)
+    #candidate_anchors += find_bigr_candidate(m_mtx, collection)
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
