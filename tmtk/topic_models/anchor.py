@@ -227,7 +227,7 @@ def find_candidate(m_mtx, collection, k=100):
         lambda w: morph.parse(collection.id_to_words(w))[0].tag.POS == u'NOUN',
         candidate_anchors)
     '''
-    
+
     return candidate_anchors
 
 def find_bigr_candidate(m_mtx, collection):
