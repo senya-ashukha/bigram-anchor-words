@@ -224,9 +224,8 @@ def find_candidate(m_mtx, collection, k=400):
             candidate_anchors.append(i)
 
     candidate_anchors = filter(
-        lambda w: morph.parse(collection.id_to_words(w))[0].tag.POS == u'NOUN',
+        lambda w: morph.parse(collection.id_to_words[w])[0].tag.POS == u'NOUN',
         candidate_anchors)
-    
 
     return candidate_anchors
 
