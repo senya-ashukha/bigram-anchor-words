@@ -82,10 +82,10 @@ def coherence(word_topic, train, test, top=10, window_with=10):
     for t in xrange(word_topic.shape[1]):
         topic_wrds = get_topic(word_topic, topic=t, head=top)
         pmi_t = [pmi(w1, w2) for w1, w2 in all_combine(topic_wrds) if pmi(w1, w2) != 0.0]
-        pmi_t = np.mean(pmi_t)
+        pmi_t = np.median(pmi_t)
         pmis.append(pmi_t)
 
-    return 'coherence = %.2f' % np.mean(pmis)
+    return 'coherence = %.2f' % np.median(pmis)
 
 def topic_coherence(tpoic, n_words, train, window_with=10):
     prob_ungrams = eval_pob_ungrams(train, tpoic)
