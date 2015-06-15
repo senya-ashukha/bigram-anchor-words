@@ -253,7 +253,7 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 
     find_cand = find_candidate if not noun else find_candidate_noun
     candidate_anchors = find_cand(m_mtx, collection)
-    
+
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
 
@@ -268,7 +268,14 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     return word_topic, anchors
 
 def print_topics(F, id_to_wrd, anch, fname, top=8):
-    f = open(fname, 'w')
+    import os
+
+    path = './results/' + fname
+
+    if not os.path.exists(os.path.split(path)[0]):
+        os.mkdir(os.path.split(path)[0])
+
+    f = open(path, 'w')
 
     for k in xrange(len(anch)):
         topwords = np.argsort(F[:, k])[-top:][::-1]
