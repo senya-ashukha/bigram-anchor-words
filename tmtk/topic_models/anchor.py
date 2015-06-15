@@ -283,6 +283,9 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     m_mtx = m_matrix(bw_train, wrd_count)
     if bi: m_mtx = add_bigramm_to_m(m_mtx, collection)
 
+    import ipdb
+    ipdb.set_trace()
+
     logger.info('Build cov matrix')
     cov_matrix = topic_cov_mtx(m_mtx)
 
