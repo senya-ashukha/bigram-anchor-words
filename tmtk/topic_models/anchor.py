@@ -258,9 +258,6 @@ def find_candidate(m_mtx, collection, k=400):
 from operator import itemgetter
 
 def add_bigramm_to_m(m_mtx, collection):
-    import ipdb
-    ipdb.set_trace()
-
     wrds = filter(lambda (wrd, wid): isinstance(wrd, tuple), collection.words_to_id.items())
     wrds = map(itemgetter(0), sorted(wrds, key=itemgetter(1)))
     bigramms_m_mtx = []
