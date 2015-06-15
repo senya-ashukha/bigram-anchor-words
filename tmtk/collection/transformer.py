@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 
 from operator import itemgetter
 from collections import Counter, defaultdict
@@ -48,13 +49,14 @@ class StopWordsRemoverTransform(MultiThreadTransformer):
         self.map = doc_stop_word_remove
 
 class BigramExtractorDocumentsTransform(Transformer):
-    def __init__(self, window_width=5, sigma=0.5, min_occur=1, min_word_len=3, top=1000):
+    def __init__(self, window_width=5, sigma=0.5, min_occur=1, min_word_len=3, top=1000, do_apply=True):
         Transformer.__init__(self)
         self.window_width = window_width
         self.sigma = sigma
         self.min_occur = min_occur
         self.min_word_len = min_word_len
         self.top = top
+        self.do_apply = do_apply
 
     def train(self, collection):
         bigrams = dict()
@@ -89,13 +91,18 @@ class BigramExtractorDocumentsTransform(Transformer):
         bigrams = filter(lambda bigr: bigr in collection.bigrams, ngrams(documents, 2))
         collection.bigrams = dict(sorted(Counter(bigrams).items(), key=itemgetter(1), reverse=True)[:self.top])
 
-    def apply(self, collection):
         max_v = max(collection.words_to_id.values()) + 1
+
 
         for bigram in collection.bigrams.keys():
             collection.words_to_id[bigram] = max_v
             collection.id_to_words[max_v] = collection.id_to_words[bigram[0]] + '_' + collection.id_to_words[bigram[1]]
             max_v += 1
+
+    def apply(self, collection):
+        if not self.do_apply:
+            logging.info('Bigramm transformer without apply')
+            return collection
 
         def apply_for_docs(docs):
             new_documents = []

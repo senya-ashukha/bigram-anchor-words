@@ -212,19 +212,10 @@ def recover_word_topic(cov_mtx, anchors, n_jobs=8):
     global x, XX
     x, XX = cov_mtx[anchors], np.dot(cov_mtx[anchors], cov_mtx[anchors].T)
 
-    import ipdb
-    ipdb.set_trace()
-
-    '''
-    cov_mtx = cov_mtx[:18378+1]
+    cov_mtx = cov_mtx[:cov_mtx.shape[0]+1] # for bigramm
 
     A = apply_rec_l2(n_jobs, cov_mtx)
-    A = np.matrix(np.diag(P_w[:18378+1])) * A
-    return np.array(A / A.sum(0))
-    '''
-
-    A = apply_rec_l2(n_jobs, cov_mtx)
-    A = np.matrix(np.diag(P_w)) * A
+    A = np.matrix(np.diag(P_w[:cov_mtx.shape[0]+1])) * A
     return np.array(A / A.sum(0))
 
 def find_candidate_noun(m_mtx, collection, k=400):
