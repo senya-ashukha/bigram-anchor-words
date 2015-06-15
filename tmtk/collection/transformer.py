@@ -99,7 +99,6 @@ class BigramExtractorDocumentsTransform(Transformer):
             max_v += 1
 
     def apply(self, collection):
-
         logging.info('Bigramm transformer without apply')
         return collection
 
