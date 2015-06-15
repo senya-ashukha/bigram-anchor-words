@@ -212,6 +212,17 @@ def recover_word_topic(cov_mtx, anchors, n_jobs=8):
     global x, XX
     x, XX = cov_mtx[anchors], np.dot(cov_mtx[anchors], cov_mtx[anchors].T)
 
+    import ipdb
+    ipdb.set_trace()
+
+    '''
+    cov_mtx = cov_mtx[:18378+1]
+
+    A = apply_rec_l2(n_jobs, cov_mtx)
+    A = np.matrix(np.diag(P_w[:18378+1])) * A
+    return np.array(A / A.sum(0))
+    '''
+
     A = apply_rec_l2(n_jobs, cov_mtx)
     A = np.matrix(np.diag(P_w)) * A
     return np.array(A / A.sum(0))
@@ -237,7 +248,25 @@ def find_candidate(m_mtx, collection, k=400):
             candidate_anchors.append(i)
     return candidate_anchors
 
-def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False, noun=False):
+from operator import itemgetter
+
+def add_bigramm_to_m(m_mtx, collection):
+    wrds = filter(lambda (wrd, wid): isinstance(wrd, tuple), collection.words_to_id.items())
+    wrds = map(itemgetter(0), sorted(wrds, key=itemgetter(1)))
+    bigramms_m_mtx = []
+
+    for w1, w2 in wrds:
+        bi = m_mtx[w1] + m_mtx[w2]
+        bigramms_m_mtx.append(bi.toarray()[0])
+
+    m_mtx = np.concatenate((m_mtx.toarray(), np.array(bigramms_m_mtx)))
+
+    m_mtx = sparse.csr_matrix(m_mtx)
+    m_mtx = m_mtx.tocsc()
+
+    return m_mtx
+
+def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False, noun=False, bi=False):
     logger.info('Start anchor_model')
 
     logger.info('Create bag of words')
@@ -245,6 +274,7 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
 
     logger.info('Build word x documents matrix')
     m_mtx = m_matrix(bw_train, wrd_count)
+    if bi: m_mtx = add_bigramm_to_m(m_mtx, collection)
 
     logger.info('Build cov matrix')
     cov_matrix = topic_cov_mtx(m_mtx)
