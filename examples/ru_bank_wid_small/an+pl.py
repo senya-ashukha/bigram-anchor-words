@@ -16,6 +16,6 @@ F, T = plsa.plsa_model(
     collection,
     wrd_count=len(collection.id_to_words),
     metrics=[preplexity, coherence, uniq_top_of_topics],
-    num_iter=40, verbose=True, F=F)
+    num_iter=3, verbose=True, F=F)
 
 plsa.print_topics(F, collection.id_to_words, 'ru_bank_wid_small/an+pl.txt')
