@@ -204,22 +204,6 @@ def apply_rec_l2(n_jobs, cov_mtx):
     A = np.matrix(Pool(n_jobs).map(RecoverL2, cov_mtx))
     return A
 
-def recover_word_topic(cov_mtx, anchors, num, n_jobs=8):
-    V, K = cov_mtx.shape[0], len(anchors)
-    P_w = np.dot(cov_mtx, np.ones(V))
-    row_normolized(cov_mtx)
-
-    global x, XX
-    x, XX = cov_mtx[anchors], np.dot(cov_mtx[anchors], cov_mtx[anchors].T)
-
-    #attantion
-    cov_mtx = cov_mtx[:18378+1]
-
-    A = apply_rec_l2(n_jobs, cov_mtx)
-    A = np.matrix(np.diag(P_w[:18378+1])) * A
-    return np.array(A / A.sum(0))
-
-'''
 def recover_word_topic(cov_mtx, anchors, num_wrd, n_jobs=8):
     V, K = cov_mtx.shape[0], len(anchors)
     P_w = np.dot(cov_mtx, np.ones(V))
@@ -233,7 +217,7 @@ def recover_word_topic(cov_mtx, anchors, num_wrd, n_jobs=8):
     A = apply_rec_l2(n_jobs, cov_mtx)
     A = np.matrix(np.diag(P_w[:num_wrd+1])) * A
     return np.array(A / A.sum(0))
-'''
+
 def find_candidate_noun(m_mtx, collection, k=400):
     candidate_anchors = []
 
