@@ -13,7 +13,7 @@ collection = transformers.apply(collection)
 
 F, anc = anchor.anchor_model(
     collection,
-    wrd_count=len(collection.id_to_words),
+    wrd_count=collection.num_wrd,
     metrics=[preplexity, coherence, uniq_top_of_topics],
     bi=True)
 
