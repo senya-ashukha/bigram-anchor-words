@@ -258,6 +258,9 @@ def find_candidate(m_mtx, collection, k=400):
 from operator import itemgetter
 
 def add_bigramm_to_m(m_mtx, collection):
+    import ipdb
+    ipdb.set_trace()
+
     wrds = filter(lambda (wrd, wid): isinstance(wrd, tuple), collection.words_to_id.items())
     wrds = map(itemgetter(0), sorted(wrds, key=itemgetter(1)))
     bigramms_m_mtx = []
@@ -282,9 +285,6 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     logger.info('Build word x documents matrix')
     m_mtx = m_matrix(bw_train, wrd_count)
     if bi: m_mtx = add_bigramm_to_m(m_mtx, collection)
-
-    import ipdb
-    ipdb.set_trace()
 
     logger.info('Build cov matrix')
     cov_matrix = topic_cov_mtx(m_mtx)
