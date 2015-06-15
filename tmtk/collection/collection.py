@@ -41,6 +41,11 @@ class FullTextCollection(Collection):
         self.id_to_words = dict(zip(map(int, self.id_to_words.keys()), self.id_to_words.values()))
         self.words_to_id = dict(imap(lambda x: (x[1], x[0]), self.id_to_words.iteritems()))
 
+        self.num_wrd = len(self.id_to_words)
+
+        print 'Read %s num doc train = %s test = %s num wrd %s' % \
+              (self.path, len(self.documents_train), len(self.documents_test), self.num_wrd)
+
         return self
 
 def bag_of_words(documents):
