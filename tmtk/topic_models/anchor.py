@@ -218,6 +218,7 @@ def recover_word_topic(cov_mtx, anchors, num, n_jobs=8):
     A = apply_rec_l2(n_jobs, cov_mtx)
     A = np.matrix(np.diag(P_w[:18378+1])) * A
     return np.array(A / A.sum(0))
+
 '''
 def recover_word_topic(cov_mtx, anchors, num_wrd, n_jobs=8):
     V, K = cov_mtx.shape[0], len(anchors)

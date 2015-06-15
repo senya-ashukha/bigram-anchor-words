@@ -97,6 +97,7 @@ class BigramExtractorDocumentsTransform(Transformer):
             collection.words_to_id[bigram] = max_v
             collection.id_to_words[max_v] = collection.id_to_words[bigram[0]] + '_' + collection.id_to_words[bigram[1]]
             max_v += 1
+            print max_v
 
     def apply(self, collection):
         logging.info('Bigramm transformer without apply')
