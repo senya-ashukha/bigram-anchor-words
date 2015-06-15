@@ -64,7 +64,14 @@ def plsa_model(collection, wrd_count, num_topics=100, num_iter=10, metrics=None,
     return F, T
 
 def print_topics(F, id_to_wrd, fname, top=9):
-    f = open(fname, 'w')
+    import os
+
+    path = './results/' + fname
+
+    if not os.path.exists(os.path.split(path)[0]):
+        os.mkdir(os.path.split(path)[0])
+
+    f = open(path, 'w')
     for i in xrange(F.shape[1]):
         cmd = 'Topic %s: ' % i + ' '.join(map(lambda x: id_to_wrd[x], get_topic(F, i, top))).encode('utf-8') + '\n'
         f.write(cmd)
