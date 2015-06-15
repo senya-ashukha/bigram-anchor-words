@@ -69,7 +69,7 @@ def print_topics(F, id_to_wrd, fname, top=9):
     path = './results/' + fname
 
     if not os.path.exists(os.path.split(path)[0]):
-        os.mkdir(os.path.split(path)[0])
+        os.makedirs(os.path.split(path)[0])
 
     f = open(path, 'w')
     for i in xrange(F.shape[1]):
