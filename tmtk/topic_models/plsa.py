@@ -48,9 +48,8 @@ def plsa_model(collection, wrd_count, num_topics=100, num_iter=10, metrics=None,
             T[t] = Ntd[t] / Nd
 
         if metrics and verbose:
-            if itter % 2 == 1:
-                metric_val = [metric(F, collection.documents_train, collection.documents_test) for metric in metrics]
-                print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
+            metric_val = [metric(F, collection.documents_train, collection.documents_test) for metric in metrics]
+            print 'iter %s: %s' % (str(itter).zfill(2), ' '.join(metric_val))
         else:
             bar.next()
 
