@@ -273,7 +273,7 @@ def print_topics(F, id_to_wrd, anch, fname, top=8):
     path = './results/' + fname
 
     if not os.path.exists(os.path.split(path)[0]):
-        os.mkdir(os.path.split(path)[0])
+        os.makedirs(os.path.split(path)[0])
 
     f = open(path, 'w')
 
