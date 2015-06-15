@@ -93,38 +93,16 @@ class BigramExtractorDocumentsTransform(Transformer):
 
         max_v = max(collection.words_to_id.values()) + 1
 
-
         for bigram in collection.bigrams.keys():
             collection.words_to_id[bigram] = max_v
             collection.id_to_words[max_v] = collection.id_to_words[bigram[0]] + '_' + collection.id_to_words[bigram[1]]
             max_v += 1
 
     def apply(self, collection):
-        if not self.do_apply:
-            logging.info('Bigramm transformer without apply')
-            return collection
 
-        def apply_for_docs(docs):
-            new_documents = []
-            for document in docs:
-                new_document = []
-                bigrams, use_next_wrd = ngrams(document, 2), True
-                for bigram in bigrams:
-                    if use_next_wrd:
-                        if bigram in collection.bigrams:
-                            new_document.append(collection.words_to_id[bigram])
-                            use_next_wrd = False
-                        else:
-                            new_document.append(bigram[0])
-                    else:
-                        use_next_wrd = True
-                new_documents.append(new_document)
-            return new_documents
-
-        collection.documents_train = apply_for_docs(collection.documents_train)
-        collection.documents_test = apply_for_docs(collection.documents_test)
-
+        logging.info('Bigramm transformer without apply')
         return collection
+
 
 class BigrammFindler(BigramExtractorDocumentsTransform):
     def apply(self, collection):
