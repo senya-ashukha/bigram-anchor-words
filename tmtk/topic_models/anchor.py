@@ -216,7 +216,7 @@ def recover_word_topic(cov_mtx, anchors, n_jobs=8):
     A = np.matrix(np.diag(P_w)) * A
     return np.array(A / A.sum(0))
 
-def find_candidate(m_mtx, collection, k=400):
+def find_candidate_noun(m_mtx, collection, k=400):
     candidate_anchors = []
 
     for i in xrange(m_mtx.shape[0]):
@@ -229,20 +229,15 @@ def find_candidate(m_mtx, collection, k=400):
 
     return candidate_anchors
 
-def find_bigr_candidate(m_mtx, collection, k=60):
-    wrds = filter(lambda x: isinstance(x, tuple), collection.words_to_id.keys())
-    wrds = map(lambda x: collection.words_to_id[x], wrds)
-    wrds = filter(lambda i: len(np.nonzero(m_mtx[i, :])[1]) > k, wrds)
+def find_candidate(m_mtx, collection, k=400):
+    candidate_anchors = []
 
-    def noun(w):
-        return morph.parse(collection.id_to_words[w].split('_')[0])[0].tag.POS == u'NOUN' or \
-               morph.parse(collection.id_to_words[w].split('_')[1])[0].tag.POS == u'NOUN'
+    for i in xrange(m_mtx.shape[0]):
+        if len(np.nonzero(m_mtx[i, :])[1]) > k:
+            candidate_anchors.append(i)
+    return candidate_anchors
 
-    wrds = filter(noun, wrds)
-
-    return wrds
-
-def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False):
+def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False, noun=False):
     logger.info('Start anchor_model')
 
     logger.info('Create bag of words')
@@ -255,9 +250,10 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     cov_matrix = topic_cov_mtx(m_mtx)
 
     logger.info('Find anch words candidat')
-    candidate_anchors = find_candidate(m_mtx, collection)
-    candidate_anchors += find_bigr_candidate(m_mtx, collection)
 
+    find_cand = find_candidate if not noun else find_candidate_noun
+    candidate_anchors = find_cand(m_mtx, collection)
+    
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
 
