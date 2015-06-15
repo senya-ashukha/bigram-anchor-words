@@ -14,4 +14,4 @@ collection = transformers.apply(collection)
 F, anc = anchor.anchor_model(
     collection, wrd_count=len(collection.id_to_words), metrics=[preplexity, coherence, uniq_top_of_topics])
 
-anchor.print_topics(F, collection.id_to_words, anc)
+anchor.print_topics(F, collection.id_to_words, anc, 'ru_bank_wid_small/an.txt')
