@@ -6,7 +6,7 @@ from tmtk.collection.collection import FullTextCollection
 from tmtk.collection.transformer_api import TransformerChainApply
 from tmtk.collection.transformer import BigramExtractorDocumentsTransform
 
-collection = FullTextCollection(path='./tmtk/corpa/ru_bank_wid_small.zip').fill()
+collection = FullTextCollection(path='./tmtk/corpa/ru_bank_wid_small.zip', lang='ru').fill()
 
 transformers = TransformerChainApply(transformers=[BigramExtractorDocumentsTransform(do_apply=False)])
 collection = transformers.apply(collection)
