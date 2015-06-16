@@ -233,7 +233,7 @@ def find_candidate_noun(m_mtx, collection, k=400):
             candidate_anchors)
     else:
         candidate_anchors = filter(
-        lambda w: nltk.pos_tag(nltk.word_tokenize(w))[0][1] == 'NN',
+        lambda w: nltk.pos_tag(nltk.word_tokenize(collection.id_to_words[w]))[0][1] == 'NN',
         candidate_anchors)
 
     return candidate_anchors
