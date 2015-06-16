@@ -23,6 +23,6 @@ F, T = plsa.plsa_model(
     collection,
     wrd_count=collection.num_wrd,
     metrics=[preplexity, coherence, uniq_top_of_topics],
-    num_iter=10, verbose=True, F=F)
+    num_iter=5, verbose=True, F=F)
 
 plsa.print_topics(F, collection.id_to_words, 'ru_bank_wid_small/an+pl+bi.txt')
