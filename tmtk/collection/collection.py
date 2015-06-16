@@ -9,8 +9,9 @@ from collections import Counter
 from tmtk.utils.iter import grouper
 
 class Collection():
-    def __init__(self, path):
+    def __init__(self, path, lang):
         self.path = path
+        self.lang = lang
 
         self.documents_train = list()
         self.documents_test  = list()

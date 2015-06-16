@@ -218,6 +218,8 @@ def recover_word_topic(cov_mtx, anchors, num_wrd, n_jobs=8):
     A = np.matrix(np.diag(P_w[:num_wrd+1])) * A
     return np.array(A / A.sum(0))
 
+import nltk
+
 def find_candidate_noun(m_mtx, collection, k=400):
     candidate_anchors = []
 
@@ -225,8 +227,13 @@ def find_candidate_noun(m_mtx, collection, k=400):
         if len(np.nonzero(m_mtx[i, :])[1]) > k:
             candidate_anchors.append(i)
 
-    candidate_anchors = filter(
-        lambda w: morph.parse(collection.id_to_words[w])[0].tag.POS == u'NOUN',
+    if collection.lang == 'ru':
+        candidate_anchors = filter(
+            lambda w: morph.parse(collection.id_to_words[w])[0].tag.POS == u'NOUN',
+            candidate_anchors)
+    else:
+        candidate_anchors = filter(
+        lambda w: nltk.pos_tag(nltk.word_tokenize(w))[0][1] == 'NN',
         candidate_anchors)
 
     return candidate_anchors
