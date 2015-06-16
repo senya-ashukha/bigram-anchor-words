@@ -15,7 +15,7 @@ F, anc = anchor.anchor_model(
     collection,
     wrd_count=collection.num_wrd,
     metrics=[preplexity, coherence, uniq_top_of_topics],
-    bi=True)
+    bi=True, k=50)
 
 anchor.print_topics(F, collection.id_to_words, anc, '20np/an+bi.txt')
 

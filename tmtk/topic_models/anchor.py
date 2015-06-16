@@ -264,7 +264,7 @@ def add_bigramm_to_m(m_mtx, collection):
 
     return m_mtx
 
-def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=False, noun=False, bi=False):
+def anchor_model(collection, wrd_count, num_topics=100, metrics=None, k=400, verbose=False, noun=False, bi=False):
     logger.info('Start anchor_model')
 
     logger.info('Create bag of words')
@@ -280,7 +280,7 @@ def anchor_model(collection, wrd_count, num_topics=100, metrics=None, verbose=Fa
     logger.info('Find anch words candidat')
 
     find_cand = find_candidate if not noun else find_candidate_noun
-    candidate_anchors = find_cand(m_mtx, collection)
+    candidate_anchors = find_cand(m_mtx, collection, k=k)
 
     logger.info('Find anch words')
     anchors = find_anchors(cov_matrix, candidate_anchors, num_topics)
