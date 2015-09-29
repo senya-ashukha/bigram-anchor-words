@@ -30,7 +30,8 @@ class FullTextCollection(Collection):
         zf = zipfile.ZipFile(self.path)
 
         if not zf.namelist() == ['test.txt', 'train.txt', 'vocab.txt']:
-            raise Exception('Collection arch must be contain only this files: test.txt, train.txt, vocab.txt')
+            raise Exception('Collection arch must be contain only this files: test.txt, train.txt, vocab.txt'
+                            ' but find %s' % zf.namelist())
 
         for text_id, doc in grouper(zf.open('train.txt'), 2):
             self.documents_train.append(map(int, doc.decode('utf-8').strip().split()))
