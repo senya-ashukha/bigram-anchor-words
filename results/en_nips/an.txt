@@ -1,0 +1,200 @@
+face:
+  face set recognit detect train test represent rate
+charact:
+  network charact train neural recognit input output system
+fire:
+  neuron spike fire rate time activ synapt model
+loss:
+  loss algorithm function vector exampl linear minim margin
+motion:
+  motion direct veloc stage visual detect move second
+cluster:
+  cluster data point algorithm set problem select thi
+tree:
+  tree decis branch structur leaf prune set probabl
+circuit:
+  circuit voltag analog chip current figur implement vlsi
+trajectori:
+  trajectori dynam time optim learn use point local
+word:
+  word recognit sequenc phonem context set sentenc vector
+extra:
+  input use featur output learn thi task perform
+action:
+  state learn action polici valu reinforc optim function
+mixtur:
+  model data mixtur estim paramet densiti use gaussian
+classifi:
+  classifi train classif class pattern perform error set
+recept:
+  field recept visual function layer input spatial size
+attent:
+  attent visual select model featur object map activ
+channel:
+  channel nois signal call inform rate equal time
+concept:
+  learn exampl concept gener sampl space distribut thi
+synaps:
+  neuron synaps synapt input pattern neural activ connect
+rotat:
+  rotat posit eye point direct angl group head
+symbol:
+  symbol represent sequenc string structur languag grammar set
+invers:
+  invers map model thi use output oper gener
+weak:
+  weak combin gener result base time obtain sampl
+theorem:
+  function theorem let comput thi follow converg result
+domin:
+  map domin correl activ function later connect featur
+sourc:
+  sourc separ signal independ compon matrix blind ica
+movement:
+  model movement motor posit arm eye muscl veloc
+recurr:
+  network neural recurr train state input time thi
+regress:
+  estim data set regress use function method predict
+match:
+  match object correspond graph point structur constraint line
+light:
+  light chang intens respons retina cone color feedback
+speech:
+  speech use recognit system train acoust wa signal
+entropi:
+  inform entropi distribut thi densiti estim approxim statist
+minima:
+  function local problem minima error gradient exampl optim
+memori:
+  memori associ capac pattern store number vector address
+letter:
+  letter pattern set sequenc figur wa string recognit
+aspect:
+  learn aspect activ represent sequenc object thi dure
+code:
+  code vector decod encod inform probabl bit thi
+delay:
+  delay time signal oscil nois system two dynam
+perceptron:
+  learn algorithm perceptron weight input set gener thi
+gate:
+  weight gate network input comput neural threshold output
+stop:
+  train error set weight network gener use exampl
+block:
+  block build system address use thi experi comput
+radial:
+  function network basi use approxim neural rbf radial
+cell:
+  cell respons cortex visual lgn cortic spatial complex
+imag:
+  imag featur pixel use scene visual textur object
+modul:
+  modul system architectur wa process task inform differ
+return:
+  use valu return algorithm problem system predict perform
+filter:
+  filter signal estim output nois process use figur
+rule:
+  rule learn thi weight gener input extract form
+partit:
+  algorithm partit problem thi figur solut one number
+conduct:
+  conduct current membran neuron input paramet model wa
+display:
+  target display figur process parallel comput differ wa
+sensori:
+  sensori thi system respons receptor motor interneuron differ
+distanc:
+  distanc vector use comput point prototyp thi space
+node:
+  node network weight layer input use output propag
+posterior:
+  distribut prior posterior bayesian paramet gaussian mean sampl
+regular:
+  regular gener case set term order number thi
+unit:
+  unit network hidden weight input learn layer output
+track:
+  system use track target posit comput locat smooth
+control:
+  control learn system feedback robot wa forward desir
+path:
+  path thi problem figur place explor use one
+subject:
+  subject wa human task cue measur field differ
+tune:
+  tune model respons stimulu neuron popul curv orient
+surfac:
+  figur surfac local point region valu thi two
+onlin:
+  learn algorithm rate converg gradient time use onlin
+bia:
+  thi bia estim error varianc set sampl use
+competit:
+  input competit pattern thi activ develop predict present
+spars:
+  spars basi comput data compon method function distribut
+princip:
+  compon data princip vector analysi matrix linear nonlinear
+seri:
+  model predict time seri use train data process
+view:
+  object view model recognit human hand novel posit
+inhibit:
+  model activ neuron inhibit connect inhibitori oscil excitatori
+concentr:
+  thi concentr effect gradient factor limit order studi
+frequenc:
+  frequenc phase sound spatial auditori amplitud respons period
+label:
+  label exampl probabl class algorithm set thi use
+text:
+  featur text document class similar analysi use machin
+energi:
+  energi solut mean point distribut comput thi field
+link:
+  neural network use link call rout connect set
+transfer:
+  weight function transfer signal neural use output perform
+ten:
+  differ one use set thi ten perform wa
+gain:
+  gain input adapt figur veloc output signal current
+event:
+  time event thi probabl distribut rel obtain valu
+preserv:
+  map space featur preserv fig neighborhood dimension time
+mode:
+  model mode figur dynam gener data thi number
+edg:
+  edg pixel contour variabl region differ smooth vision
+invari:
+  invari transform pattern thi one scale gener vector
+role:
+  pattern structur role activ represent repres similar bind
+cycl:
+  connect cycl thi system one output implement time
+segment:
+  segment line group figur recognit featur system frame
+digit:
+  network neural digit use test thi perform output
+evid:
+  model evid thi one approxim condit effect also
+bound:
+  bound function thi lower number valu result approxim
+stabil:
+  network system neural dynam neuron point equat stabil
+markov:
+  model state probabl markov estim sequenc variabl observ
+util:
+  system use thi util wa valu inform result
+electr:
+  electr thi potenti measur fish fig simul brain
+prefer:
+  prefer orient direct select order thi center posit
+ideal:
+  perform use observ thi wa comput ideal simul
+identif:
+  algorithm use neural system wa perform oper identif
