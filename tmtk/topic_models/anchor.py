@@ -212,10 +212,10 @@ def recover_word_topic(cov_mtx, anchors, num_wrd, n_jobs=8):
     global x, XX
     x, XX = cov_mtx[anchors], np.dot(cov_mtx[anchors], cov_mtx[anchors].T)
 
-    cov_mtx = cov_mtx[:num_wrd+1] # for bigramm
+    cov_mtx = cov_mtx[:num_wrd] # for bigramm
 
     A = apply_rec_l2(n_jobs, cov_mtx)
-    A = np.matrix(np.diag(P_w[:num_wrd+1])) * A
+    A = np.matrix(np.diag(P_w[:num_wrd])) * A
     return np.array(A / A.sum(0))
 
 import nltk
@@ -238,7 +238,7 @@ def find_candidate_noun(m_mtx, collection, k=400):
 
     return candidate_anchors
 
-def find_candidate(m_mtx, collection, k=400):
+def find_candidate(m_mtx, collection, k):
     candidate_anchors = []
 
     for i in xrange(m_mtx.shape[0]):
@@ -264,7 +264,7 @@ def add_bigramm_to_m(m_mtx, collection):
 
     return m_mtx
 
-def anchor_model(collection, wrd_count, num_topics=100, metrics=None, k=400, verbose=False, noun=False, bi=False):
+def anchor_model(collection, wrd_count, num_topics=100, metrics=None, k=1000, verbose=False, noun=False, bi=False):
     logger.info('Start anchor_model')
 
     logger.info('Create bag of words')
