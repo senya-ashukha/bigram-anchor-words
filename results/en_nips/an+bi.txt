@@ -1,0 +1,200 @@
+mixtur:
+  model mixtur data paramet use gaussian compon variabl
+likelihood:
+  estim likelihood paramet data thi model use variabl
+fire:
+  fire spike rate time activ stimulu synapt fig
+action:
+  state action polici valu optim reinforc time function
+network:
+  network neural train use perform weight output architectur
+loss:
+  function algorithm loss use linear exampl minim approxim
+face:
+  face set recognit algorithm featur test imag use
+ocular_domin:
+  map pattern domin featur ocular activ cortic develop
+float_gate:
+  input weight gate output comput function threshold linear
+motion:
+  motion direct stage veloc visual figur move two
+classifi:
+  classifi train classif perform pattern class use problem
+reinforc_learn:
+  learn task weight error train rate gradient chang
+speech:
+  use speech recognit wa data perform test acoust
+unit:
+  unit hidden weight activ input output train pattern
+intens:
+  thi intens figur retina pixel detect photoreceptor background
+cluster:
+  data cluster point algorithm set assign optim problem
+motor_command:
+  model motor movement system command arm human muscl
+cell:
+  cell lgn dendrit respons complex phase retina rat
+ten:
+  differ one ten kind neural individu anoth two
+charact:
+  system charact train neural recognit output net inform
+minima:
+  function local number error minima approxim gener distribut
+tree:
+  tree decis set branch probabl number thi leaf
+concentr:
+  thi gradient concentr effect constant factor valu one
+extra:
+  use input output featur thi current one extra
+rotat:
+  rotat posit point thi direct eye angl coordin
+concept:
+  exampl gener concept thi distribut learn sampl hypothesi
+attent:
+  model attent visual select recognit mechan process view
+tune:
+  tune stimulu popul respons curv distribut thi width
+markov_chain:
+  chain region human protein sequenc comput probabl domain
+stop:
+  train error set weight gener use exampl test
+imag:
+  imag featur pixel use scene textur vision edg
+entropi:
+  thi inform distribut entropi estim approxim statist sampl
+vector_quantiz:
+  vector matrix space quantiz product support oper bit
+delay:
+  system time neural delay dynam oscil signal stabil
+weak:
+  input weak test strong select wa sequenc set
+sourc:
+  sourc separ compon signal independ ica matrix use
+theorem:
+  function theorem let comput thi follow result ani
+tangent_distanc:
+  distanc comput use transform tangent method point prototyp
+subject:
+  wa subject human cue perform figur locat experi
+trajectori:
+  trajectori dynam use time model paramet local optim
+channel:
+  channel nois eeg wa time inform rate tempor
+text:
+  use text document similar featur comput thi represent
+memori:
+  memori associ store capac pattern number address recal
+partit:
+  algorithm thi problem partit one figur point path
+phi_rev:
+  thi dynam order equat paramet one case gener
+control:
+  control system feedback adapt desir gain song plant
+preserv:
+  space map featur preserv fig neighborhood valu dimension
+electr:
+  electr thi fish field measur system sens electrod
+layer:
+  layer output input pattern wa network unit hidden
+node:
+  node thi propag number graph use one output
+neuron:
+  neuron activ biolog synapt potenti neural interact oscil
+frequenc:
+  frequenc sound spatial respons veloc auditori tempor stimulu
+light:
+  light chang thi cone result respons feedback illumin
+optic_flow:
+  optic flow comput analog output thi implement one
+competit:
+  input activ competit pattern present develop associ thi
+block:
+  block use thi build address one design implement
+circuit:
+  circuit voltag analog figur chip implement vlsi current
+regress:
+  set estim data regress use method kernel valu
+object:
+  object view recognit featur human similar structur translat
+radial:
+  function approxim basi smooth use gaussian radial neural
+letter:
+  letter task wa set perform use pattern train
+expand:
+  map experi result expand show thi normal figur
+symbol:
+  symbol represent thi set sequenc one structur connectionist
+track:
+  system use comput target track smooth thi process
+recept:
+  field recept visual spatial cortic function respons mean
+princip:
+  data compon princip analysi pca linear matrix neural
+kalman_filter:
+  filter signal use process linear nonlinear nois gaussian
+code:
+  code inform encod decod bit probabl nois distribut
+predict:
+  predict error gener thi train set seri test
+place:
+  place direct field environ goal figur explor move
+sensori:
+  system thi sensori respons properti inform eye receptor
+converg:
+  algorithm converg problem thi iter optim updat valu
+return:
+  algorithm use valu return perform time method problem
+synaps:
+  synaps synapt pattern activ neuron neural input hebbian
+invers:
+  invers thi use map nonlinear linear point result
+brain:
+  brain map comput differ activ function compon simul
+orient:
+  orient model visual cortex center respons prefer local
+conduct:
+  conduct current potenti membran wa respons chang increas
+robot_arm:
+  robot use posit environ task space figur map
+perceptron:
+  weight perceptron error set gener algorithm net backpropag
+word:
+  word thi sequenc test recognit figur vowel wa
+match:
+  match point comput segment graph constraint line two
+role:
+  pattern role activ structur repres bind distribut represent
+boltzmann_machin:
+  machin problem boltzmann space one thi method comput
+label:
+  label class probabl thi set use exampl one
+connect:
+  connect input later cycl pattern area link figur
+posterior:
+  distribut paramet posterior bayesian prior gaussian probabl mean
+amplitud:
+  signal amplitud spike correl differ inform valu nois
+rule:
+  rule thi weight learn gener inform figur ha
+spars:
+  spars use basi compon method comput distribut represent
+bar:
+  bar respons select complex contrast stimuli visual test
+recurr:
+  state recurr network input time output dynam thi
+surfac:
+  figur surfac local region point two comput constraint
+densiti:
+  densiti estim nois gaussian thi probabl condit varianc
+uniqu:
+  solut point support uniqu thi one case set
+event:
+  time event probabl rate rel thi distribut inform
+bound:
+  bound thi function valu number case result approxim
+markov:
+  model state probabl markov observ transit sequenc estim
+display:
+  display figur differ process target result perform locat
+inhibit:
+  model inhibit inhibitori activ oscil cortex cortic respons
