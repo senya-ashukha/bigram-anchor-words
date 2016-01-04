@@ -1,5 +1,5 @@
 from tmtk.topic_models import anchor, plsa
-
+че это еще за гавно?
 from tmtk.metrics.metrics import preplexity, coherence, uniq_top_of_topics
 from tmtk.collection.collection import FullTextCollection
 
