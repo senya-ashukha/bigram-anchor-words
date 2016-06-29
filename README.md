@@ -4,6 +4,7 @@ Bag of words, very poor representation of the text, since a lot of information i
 We had modified Anchor Words Topic Model [1] to take into account word collocation, the result is published un conference paper [2]. 
 
 [1] Sanjeev A., Rong G.: A Practical Algorithm for Topic Modeling with Provable Guarantees (NIPS, 2012) 
+
 [2] Ashuha A., Loukachevitch N.: Bigramm Anchor Words Topic Model, Analysis of Images, Social Networks, and Texts (AIST, 2016)
 
 # Experiments 
