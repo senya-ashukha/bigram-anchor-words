@@ -1,2 +1,5 @@
 *idea*
 *.pyc
+.DS_Store
+examples/.DS_Store
+tmtk/.DS_Store

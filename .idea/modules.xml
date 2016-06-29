@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/tmtk.iml" filepath="$PROJECT_DIR$/.idea/tmtk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/bigram-anchor-words.iml" filepath="$PROJECT_DIR$/.idea/bigram-anchor-words.iml" />
     </modules>
   </component>
 </project>
