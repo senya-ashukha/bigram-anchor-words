@@ -1,0 +1,313 @@
+\documentclass[runningheads,a4paper]{llncs}
+
+\usepackage[T2A]{fontenc}		
+\usepackage[utf8]{inputenc}	
+\usepackage[english]{babel}	
+
+\usepackage[noend]{algpseudocode}
+\usepackage{listings, chngcntr, float, amsmath, 
+	                 caption, setspace, amssymb, graphicx, 
+	                 xcolor, url, algorithm, pifont, wrapfig}
+
+\begin{document}
+
+	\title{Bigram Anchor Words Topic Model}
+	\toctitle{Bigram Anchor Words Topic Model}
+	\titlerunning{Bigram Anchor Words Topic Model}
+	
+	\author{
+		Ashuha Arseniy\inst{1}
+		\and
+		Loukachevitch Natalia\inst{2}
+	}
+	
+	\tocauthor{Ashuha Arseniy, Loukachevitch Natalia}	
+	\authorrunning{Ashuha Arseniy, Loukachevitch Natalia}
+
+	\institute{
+		Moscow Institute of Physics and Technology,\\
+		\email{ars.ashuha@pystech.edu},\\
+		\and
+		Research Computing Center of Lomonosov Moscow State University,\\
+		\email{louk\_nat@mail.ru}
+	}
+	
+	\maketitle
+	
+	\begin{abstract}
+		A probabilistic topic model is a modern statistical tool for document collection analysis that allows extracting a number of topics in the collection and describes each document as a discrete probability distribution over topics. Classical approaches to statistical topic modeling can be quite effective in various tasks, but the generated topics may be too similar to each other or poorly interpretable. We supposed that it is possible to improve the interpretability and differentiation of topics by using linguistic information such as collocations while building the topic model. In this paper we offer an approach to accounting bigrams (two-word phrases) for the construction of Anchor Words Topic Model.
+		\keywords{topic model, anchor words, bigram}
+	\end{abstract}
+	
+	\section{Introduction}   
+A probabilistic topic model is a modern statistical tool for document collection analysis that allows identifying a set of topics in the collection and  describes each document as a discrete probability distribution over topics. The topic is meant a discrete probability distribution over words, considered as a thematically related set of words. Topic models are actively used for various applications such as text analysis \cite{gao2012joint,nokel2015topic,cheng2014btm}, users' analysis \cite{krestel2009latent}, information retrieval \cite{mei2008topic,vorontsov2014additive}. 
+
+To recognize hidden topics, standard algorithms of topic modeling such as PLSA or LDA \cite{hofmann1999probabilistic,blei2003latent}, take into account only the frequencies of words and do not consider the syntactic structure of sentences, the word order, or grammatical characteristics of words. Neglect of the linguistic information causes the low interpretability and the low degree of topic differentiation \cite{vorontsov2014additive}, which may hinder the use of topic models. If a topic has the low interpretability then it may seem as a set of unrelated words or a mixture of several topics. It is difficult to differentiate  topics when they are very similar to each other.
+
+One of the approaches that improves the interpretability of the topics is proposed in \cite{arora2012learning,arora2012practical} and is called Anchor Words. This approach is based on the assbumption that in each topic there exists a unique word that describes the topic, but this approach is also built on word frequencies.
+
+In this paper we put forward a modification of the Anchor algorithm, which allows us to take into account collocations when building a topic model. The experiments were conducted on various text collections (Banks Articles, 20 Newsgroups, NIPS) and confirmed that the proposed method improved the interpretability and the uniqueness of topics without downgrading other quality measures.
+
+The paper is organized as follows. Section 2 reviews similar work. Section 3 describes the metrics used for evaluating the quality of topic models. In Section 4, we propose a method that allows us to take into account collocations in the Anchor Words topic model.
+
+\section{Related work}
+	\subsection{Notation and basic assumptions} 
+	Many variants of topic modeling algorithms have been proposed so far.  Researchers usually suppose that a topic is a set of words that describe a subject or an event;  a document is a set of topics that have generated it. A {\bf Topic}  is a discrete probability distribution over words: topic $t~=~\{\mathrm{P}(w|t):~w \in W\}$~\cite{hofmann1999probabilistic,blei2003latent}. In this notation, each word in each topic has a certain probability,  which may be equal to zero. Probabilities of words in topics are usually stored in the matrix $\Phi_{\mathrm{W} \times \mathrm{T}}$. A {\bf Document} is a discrete probability distribution over topics $\mathrm{P}(t|d)$~\cite{hofmann1999probabilistic,blei2003latent}. These probabilities  are represented as a  matrix $\Theta _{\mathrm{T} \times \mathrm{D}}$.
+		
+	In topic modeling, the following hypotheses are usually presupposed: a \textbf{Bag of words hypothesis} is the assumption that it is possible to determine which topics have generated the document without taking into account the order of words in the document; \textbf{Hypothesis of conditional independence} is the assumption that the topic does not depend on the document, the topic is represented by the same discrete distribution in each document which contains this topic. Formally, the probability of a word in the topic is not dependent on the document --  $\mathrm{P}(w|d, t)= \mathrm{P}(w|t)$~\cite{vorontsov2014additive,hofmann1999probabilistic,blei2003latent}; {\bf Hypothesis about the thematic structure of the document} assumes that the probability of a word in a document depends on the hidden topics that have generated the document, as, for example, in the simplest topic model:
+		\begin{equation}
+		p(w|d)=\sum_{t \in \mathrm{T}} \mathrm{P}(w|d, t)\mathrm{P}(t|d) = \sum_{t \in \mathrm{T}} \mathrm{P}(w|t)\mathrm{P}(t|d)
+		\end{equation}
+	
+	\subsection{Specific Topic models}
+    
+	In this section we consider several well-known approaches to topic modeling.
+    
+    \subsubsection{Probabilistic Latent Semantic Analysis, PLSA} was proposed by Thomas Hoffman in \cite{hofmann1999probabilistic}. To build the model, he supposed to optimize the log-likelihood with the restrictions of normalization and non-negativeness:
+	\begin{align}
+	log~L(D, \Phi, \Theta) =  log~\prod_{d \in \mathrm{D}} \prod_{w \in d} p(w|~d) \rightarrow \max_{\Phi,\Theta} \\
+	\phi_{wt} \geq 0;~\sum_{w \in W} \phi_{wt} = 1;~\theta_{td} \geq 0;~\sum_{t \in T} \phi_{td} = 1 
+	\end{align}
+	
+To solve the optimization problem, it was proposed to apply the EM-algorithm, which is usually used to find the maximum likelihood estimate of probability model parameters when the model depends on hidden variables.
+
+	\subsubsection{Latent Dirichlet allocation, LDA} was proposed by David Blei in \cite{blei2003latent}. This paper introduces the generative model that assumes that the vectors of topics and the vectors of documents are generated from the Dirichlet distribution. For training the model, it was proposed to optimize the following function:
+\begin{align}
+	log~L(D, \Phi, \Theta) \prod_{d} Dir(\theta_d| \beta) \prod_{t} Dir(\phi_t| \alpha) \rightarrow \max_{\Phi, \Theta}\\
+    	\phi_{wt} \geq 0;~\sum_{w \in W} \phi_{wt} = 1;~\theta_{td} \geq 0;~\sum_{t \in T} \phi_{td} = 1 
+\end{align}
+
+To solve the optimization problem, the authors use the  Bayesian inference, which leads to EM-algorithm similar to PLSA. Because of the factored-conditional conjugate prior distribution and the likelihood, the formula for the parameters update can be written explicitly.
+  
+	\subsubsection{Additive Regularization Topic Model} was proposed by Konstantin Vorontsov in ~\cite{vorontsov2014additive}. The "Additive Regularization Topic Model" generalizes LDA (the LDA approach can be expressed in terms of an additive regularization) and allows applying a combination of regularizers to topic modeling by optimizing the following functional:
+\begin{align}log~L(\Phi, \Theta) + \sum_{i=1}^{n} \tau_i R_i(\Phi, \Theta) \rightarrow \max_{\Phi,\Theta}~~~~~~~~~~\\
+\phi_{wt} \geq 0;~~~\sum_{w \in W} \phi_{wt} = 1;~~~\theta_{td} \geq 0;~~~\sum_{t \in T} \phi_{td} = 1\end{align}
+	
+	\noindent where, $\tau_i$ -- weight of regularizer, $R_i$ -- regularizer. 
+	
+	To introduce regularizers, the Bayesian inference is not used. On the one hand, it simplifies the process of entering regularizers because it does not require the technique of Bayesian reasoning, on the other hand, the introduction of a new regularizer is an art, which is hard to formalize.
+
+	The paper \cite{vorontsov2014additive} shows that the use of the additive regularization allows simulating reasonable assumptions about the structure of topics, which helps to improve some properties of a topic model such as interpretability and sparseness.
+	
+	\subsubsection{Anchor Words Topic Model}  was proposed by Sanjeev Arora in ~\cite{arora2012learning,arora2012practical}.  The basic idea of this method is the assumption that for each topic $t_i$ there is an anchor word that has a nonzero probability only in the topic $t_i$. If one have the \emph{anchor words}  one can recover a topic model without EM algorithm.
+
+	The algorithm \ref{hlaw} consists of two steps: the search of anchor words and recovery of a topic model with anchor words. Both procedures use the matrix $Q_{W \times W}$ that contains joint probabilities of co-occurrence of word pairs $p(w_i, w_j)$, $\sum Q_{ij} = 1$. Let us denote row-normalized matrix $Q$ as $\hat{Q}$, the matrix $\hat{Q}$ can be interpreted as $\hat{Q}_{i, j} = p (w_j | w_i)$. 
+	
+	\begin{singlespacing}
+		\begin{algorithm}
+			\caption{High Level Anchor Words}
+			\label{hlaw}
+			\textbf{Input}: collection $\textrm{D}$, number of topics $|\textrm{T}|$\\
+			\textbf{Output}: matrix $\Phi$; 
+			\begin{algorithmic}[1]
+				\State $Q$ = Word Co-occurences($\textrm{D}$)
+				\State $\hat{Q}$ = $Rows\_normalized(Q)$
+				\State $\hat{Q}$ = $Random\_projection(\hat{Q})$
+				\State $S$ = FindAnchorWords($\hat{Q}$, $|\textrm{T}|$)
+				\State $\Phi$ = RecoverWordTopic($\hat{Q}$, $S$)
+				\State \Return $\Phi$
+			\end{algorithmic}
+		\end{algorithm}
+	\end{singlespacing} 
+	
+	Let us denote indexes of anchor words $S = \{s_1, \dots ,s_T\}$. The rows indexed by elements of $S$ are special in that every other row of $\hat{Q}$ lies in the convex hull of the rows indexed by the anchor words \cite{arora2012practical}. At the next step optimization problems are solved. It's done to recover the expansion coefficients of $C_{it} = p(t|w_i)$, and then using the Bayes rule we restore matrix $(p(w|t))_{W \times T} $. The search of anchor words is equal to the search for almost convex hull in the vectors of the matrix $\hat{Q}$ \cite {arora2012practical}. The combinatorial algorithm that solves the problem of finding the anchor words is given in Algorithm \ref{find_anch}.
+	
+	
+	\begin{algorithm}[H]
+		\caption{The combinatorial algorithm FastAnchorWords}
+		\label{find_anch}
+		\textbf{Input}: dots $V = {v_1, \dots, v_n}$, dim of convex hull $K$, parameter of error $\epsilon$;\\
+		\textbf{Output}: $\{v'_{1}, \dots, v'_{k}\}$ -- set of points which constitute the convex hull; 
+		\begin{algorithmic}[1]
+			\State put $v_i$ into random subspace $V$,  $dim V = 4log V / \epsilon^2$
+			\State S = $\{s_0\}$, $s_0$ -- point that has the largest distance to origin.
+			\ForAll i=1 to K:
+			\State denote point $\in$ V that has the largest distance to $span(S)$ as $s_i$
+			\State $S = S \cup \{s_i\}$
+			\EndFor
+			\ForAll i=1 to K:
+			\State denote point $\in$ V that has the largest distance to $span(S\setminus\{s_i\})$ as $s'_i$
+			\State update  $s_i$ on $s'_i$
+			\EndFor
+			\Return  S
+		\end{algorithmic}
+	\end{algorithm}
+	
+	\subsection{Integration of n-grams into topic models}
+
+   The above-discussed topic models are based on single words (unigrams). Sometimes collocations can more exactly define a topic than individual words, therefore various approaches have been proposed to take into account word combinations while building  topic models. 
+   
+	\subsubsection{Bigram Topic Model} proposed by Hanna Wallach in \cite{wallach2006topic}. This model involves the introduction of the concept a hierarchical language model Dirichlet \cite{mackay1995hierarchical}. It is assumed that the appearance of a word depends on the topic and the previous word, all word pairs are collocations.
+	
+	\subsubsection{LDA Collocation Model} proposed by M. Steyvers in \cite{steyvers2005matlab}. The model introduces a new type of hidden variables $x$ ($x = 1$, if $w_{i-1}w_{i}$ is collocation 0 else). This model can take into account the bigrams and unigrams, unlike the bigram topic model, where each pair of words are collocations.
+	
+	\subsubsection{N-gram Topic Model} proposed by Xuerui Wang in \cite{wang2007topical}.  This model adds the relation between topics and indicators of bigrams that allows us to understand the context depending on the value of the indicator \cite{wang2007topical}.
+	
+	\subsubsection{PLSA-SIM} proposed by Michail Nokel in \cite{nokel2015topic}. The algorithm takes into account the relation between single words and bigrams (PLSA-SIM). Words and bigrams are considered as similar if they have the same component word. Before the start of the algorithm, sets of  similar words and collocations are pre-calculated. The original algorithm PLSA is modified to increase the weight of similar words and phrases in case of their co-occurrence in the documents of the collection. 
+	
+	\section{Methods to estimate the quality of topic models}
+	To estimate the quality of topic models, several metrics were proposed.
+	
+	\subsubsection*{Perplexity} is a measure of inconsistency of a model towards the collection of documents. The perplexity is defined as:
+	\begin{equation}
+	P(D, \Phi, \Theta) = exp\left( -\frac{1}{len(\textrm{D})}~log~L(D, \Phi, \Theta) \right)
+	\label{perp}
+	\end{equation}
+	
+	Low perplexity means that the model well predicts the appearance of terms in the collection. The perplexity depends on the size of a vocabulary: usually with the increase of the collection vocabulary, the perplexity is growing.
+	
+	\subsubsection*{Coherence} is an automatic metric of interpretability proposed by David Newman in~\cite{newman2010automatic}. In  \cite{newman2010automatic} David Newman showed that the proposed measure of coherence has the high correlation with the expert estimates of topics interpretability. 
+	
+	\begin{equation}
+	PMI(w_i, w_j) = log\frac{p(w_1, w_2)}{p(w_1)p(w_2)}
+	\end{equation}
+	
+	The coherence of a topic is the median coherence of word pairs  representing the topic, usually it is calculated for $n$ most probable elements in the topic. The coherence of the model is the median of the topics coherence.
+	
+	\subsubsection*{A measure of the kernels uniqueness} Human-constructed topics usually have unique kernels, that is words having high probabilities in the topic. The measure of kernel uniqueness shows to what extent topics are different to each other.
+    
+    \begin{equation}
+	U(\Phi) = \frac{|\cup_{t}kernel(\Phi_t)|}{\sum_{t \in T} |kernal(\Phi_t)|}
+	\label{uk}
+	\end{equation}
+	
+	If the uniqueness of the topic kernels is closer to one then we can easily distinguish topics from each other. If it is closer to zero then many topics are similar to each other, contain the same words in their kernels. In this paper the kernel of a topic means ten the most probable words in the topic.
+	
+	\section{Bigram Anchor Words Topic Modeling} 
+	The bag of words text representation does not take into account the order of words in documents, but, in fact, many words are used in phrases, which can form completely different topics.
+	
+	Usually adding collocations as unique elements of the vocabulary significantly impairs the perplexity by increasing the size of the vocabulary, but the topic model interpretability is increased. The question arises: if it is possible to consider  collocations in the Anchor Words algorithm without adding them to the vocabulary.
+	
+	\subsection{Extracting collocations (bigrams)}
+	To extract collocations, we used the method proposed in \cite{dobrov2003forming}. The authors propose the following algorithm. If several words in a text mean the same entity then in this text these words should appear beside each other more often than separately. It was assumed that if a pair of words co-occurs as immediate neighbors more than half of their appearances in the same text box, it indicates that this pair of words is a collocation. For further use in topic models, we will be use 1000 most frequent bigrams extracted from the source text collection.
+	
+	\subsection{Representation of collocations in Anchor Words model}
+	One of the known problems in statistical topic modeling is the high fraction of repeated  words in different topics. If one wants to describe topics in a collection only with unigrams there are many degrees of freedom to determine the topics. Multiword expressions such as bigrams can facilitate more diverse description of extracted topics. Typically, the addition of bigrams as unique elements of a vocabulary increases the number of model parameters and degrades the  perplexity. Further in the article, we put forward the modification of Anchor Words algorithm that can use the unigrams and bigrams as anchor words and improve the perplexity of the source Anchor topic model.
+	
+	In the step 3 of the algorithm \ref{hlaw}, each word  $w_i$ is mapped to vector $\hat{Q}_i$. The problem of finding the anchor words is the allocation of the "almost convex hull"\cite{arora2012practical} in the vectors $\hat{Q}_i$. Each topic has a single anchor word with corresponding vector from the set of $\hat{Q}_i$. 
+    
+    The space, which contains the vector $\hat{Q}_i$, has a thematic semantics, therefore each word may become an anchor, and thus may correspond to a some topic. To search anchor words means to find vectors corresponding to the basic hidden topics, so that the remaining topics are linear combination of basic topics. 
+	
+	Our main assumption is that in the space of word candidates onto anchor words positions ($\hat{Q}$), bigrams $\vec {w_iw_j} $, are presented as a sum of vectors $\vec{w} _i$ +$\vec{w} _j$ . We prepare a set of bigrams and add vectors according to this bigrams in a set of anchor word candidates.
+	 
+	The search of the anchor words happen directly using the distance of each word on the current convex hull (Algorithm \ref{find_anch}). Bigrams that have on their composition two vectors close to the borders of current convex hull are given the priority in the process of selection of anchor words. It is caused by the increase of the norm of the resultant vector in the direction of convex hull expansion. Therefore, while searching anchor words, we take into account bigrams and increase the probability of choosing a bigram as an anchor word that can be interpreted as a regularization.
+	
+	The expansion of the convex hull helps to describe more words through the fixed basis. It is important to note that unreasonable extension of the convex hull can break the good properties of the model, such as interpretability. An algorithm for constructing the bigram anchor words model is shown at Algorithm~\ref{bian}. It differs from  the original algorithm only in lines 4 and 5.
+	
+	\begin{singlespacing}
+		\begin{algorithm}
+			\caption{High Level Bigram Anchor Words}
+			\label{bian}
+			\textbf{Input}: collection $\textrm{D}$, number of topics тем $|\textrm{T}|$, \textcolor{red}{set of bigrams $\textrm{C}$}\\
+			\textbf{Output}: matrix $\Phi$; 
+			\begin{algorithmic}[1]
+				\State $Q$ = Word Co-occurences($\textrm{D}$)
+				\State $\hat{Q}$ = $Rows\_normalized(Q)$
+				\State $\hat{Q}$ = $Random\_projection(\hat{Q})$
+				\State \textcolor{red}{$\hat{B} = {\hat{Q}_{1}, \dots, \hat{Q}_{n}, \hat{Q}_{C_{11}} + \hat{Q}_{C_{12}}, \dots, \hat{Q}_{C_{n1}} + \hat{Q}_{C_{n2}}}$}
+				\State $S$ = FindAnchorWords(\textcolor{red}{$\hat{B}$}, $|\textrm{T}|$)
+				\State $\Phi$ = RecoverWordTopic($\hat{Q}$, $S$)
+				\State \Return $\Phi$
+			\end{algorithmic}
+		\end{algorithm}
+	\end{singlespacing} 
+	
+	\subsection{Experiments} 
+    
+    The experiments were carried out on three collections:
+    \begin{enumerate}
+	 	\item \textit{\textbf{Banks Articles}} -- a collection of banking articles, 2500 documents (2000 for the train, 500 for the control), 18378 words.
+    	\item \textit{\textbf{20 Newsgroups}} -- a collection of short news stories, 18846 documents (11314 for the train, 7532 for the control), 19570 words.
+    	\item \textit{\textbf{NIPS}} -- a collection of abstracts from the Conference on Neural Information Processing Systems (NIPS), 1738 documents (1242 for the train, 496 for the control), 21358 words.
+	\end{enumerate}
+	
+   \noindent \textbf{All collections have been preprocessed.} The characters were brought to lowercase, characters which do not belong to Cyrillic and Latin alphabet were removed, words have been normalized (or stemmed for English collections), stop words and words with the length less than four letters were removed. Also words occurring less than 5 times were rejected. Collocations have been extracted with the algorithm described in Section 4.1. The preprocessed collections are available on the page, \texttt{github.com/ars-ashuha/tmtk}. In all experiments,  the number of topics was fixed $|T| = 100$.
+   
+	\noindent \textbf{The metrics} were calculated as follows:
+	\begin{itemize}
+		\item To calculate perplexity, the collection was divided into train and control parts. When calculating perplexity on test samples, each document was subdivided into two parts. In the first part, the vector of topics for the document was estimated, on the second part, perplexity was calculated . 
+		\item When calculating the coherence, the conditional probabilities are calculated with a window of 10 words.
+		\item When calculating the unique kernel, ten most probable words in a topic were considered as its kernel.
+	\end{itemize}
+	
+	\noindent \textbf {The experiments were performed on the following models}: PLSA (\text{PL}), Anchor Words (\texttt {AW}), Bigram Anchor Words (\texttt{BiAW}), Anchor Words and PLSA combination (\texttt{AW + PL}), Bigram Anchor Words and PLSA combination (\texttt{BiAW + PL}). The combination was constructed as follows: the topics obtained by the Anchor Word or Bigram Anchor Word algorithm, were used as an initial approximation for PLSA algorithm. In experiments, perplexity was measured on the control sample (\textit{$ P_ {test}$}), coherence is denoted as (\textit{$PMI$}), the uniqueness of the nuclei is denoted as (\textit{$U$}). The results are shown in Table \ref{tab:res}.
+
+	\begin{table}
+		\centering
+		\caption{Results of Numerical experiments}
+		\label{tab:res}
+		\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+			\hline
+			\textbf{Collection} & \multicolumn{3}{l|}{\textit{\textbf{Banks Articles}}}    & \multicolumn{3}{l|}{\textit{\textbf{20 Newsgroups}}} & \multicolumn{3}{l|}{\textit{\textbf{~~~~~NIPS}}}    \\ \hline
+			\textbf{Metric}   & \textit{$P_{test}$} & \textit{PMI}    & \textit{U}    & \textit{$P_{test}$}  & \textit{PMI}    & \textit{U}    & \textit{$P_{test}$} & \textit{PMI}    & \textit{U}    \\ \hline
+			\texttt{PL}        & 2116                & 0.60          & 0.40          & 2155                 & 0.31          & 0.40          & 1635                & 0.21          & 0.32          \\ \hline
+			\texttt{AW}        & 2330                & 0.63          & 0.53          & 2268                 & 0.38          & 0.41          & 1505                & 0.41          & 0.38          \\ \hline
+			\texttt{BiAW}     & 2248                & 0.79          & 0.60          & 2183                 & 0.68          & 0.54          & 1500                &  0.50          &  0.41          \\ \hline
+			\texttt{AW+PL}     & 2052                & 0.78          & 0.58          & 2053                 & 0.54          & 0.55          & 1434                & 0.52          & 0.46          \\ \hline
+			\texttt{BiAW+PL}  & \textbf{1848}       & \textbf{0.87} & \textbf{0.63} & \textbf{2027}        & \textbf{0.78} & \textbf{0.64} & \textbf{1413}       & \textbf{0.58} & \textbf{0.49} \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	As in the experiments of the authors of the \text{Anchor Words} model, the perplexity grows (in two collections out of three), which is a negative phenomenon, but the  uniqueness and interpretability of the topics also grows. The combination of \textit{Anchor Words} and \textit{PLSA} models shows the results better than \textit{Anchor Words} or \textit{PLSA} separately.
+	
+	The \text{Bigram Anchor Words}model shows better results than the original \textit{Anchor Words}: has lower perplexity, greater interpretability and uniqueness of kernels, but is still inferior to the  \textit{PLSA} model in perplexity. The combination of  \textit{Bigram Anchor Words} and \textit{PLSA} models shows better results than other models; this combination has higher interpretability and uniqueness of the kernels.
+	
+	It can be concluded that the initial approximation, given by the  \textit{Bigram Anchor Words} model, is more optimal in terms of achieving final perplexity and other metrics of quality. This approximation improves the sensitivity of \textit{PLSA} to the initial approximation, which, in turn, can be formed taking into account the linguistic knowledge. Tables \ref{tab:bank} and \ref{tab:nips} contain examples of topics for Bank and NIPS collections.
+	
+	\begin{table}[H]
+		\centering
+   		\caption{Examples of topics for the Bank collection}
+		\label{tab:bank}
+		\begin{tabular}{|l|l|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|l|}{\textbf{~~~~~~~~PLSA}}           & \multicolumn{2}{l|}{\textbf{~~~~~~~~ANW}}             & \multicolumn{2}{l|}{\textbf{~ANW+ PLSA + BI}}         \\ \hline
+			\textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} & \textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} & \textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} \\ \hline
+			рынок                     & кредит                    & акция                     & кредит                    & рынок                     & кредит                    \\
+			российский                & кредитный                 & рынок                     & кредитован              & инвестор                  & замщик                    \\
+			инвестор                  & замщик                    & размещение                & потребитель          & акция                     & ипотечный                 \\
+			фондовый                  & кредитован              & акционер                  & ипотечный                 & фондовый                  & кредитован              \\
+			облигация                 & ставка                    & инвестор                  & замщик                    & инструмент                & залог                     \\
+			бумага                    & банка                     & капитал                   & банк                      & биржа                     & портфель                  \\
+			инструмент                & процентный                & фондовый                  & население                 & облигация                 & задолжен             \\
+			фонд                      & срок                      & биржа                     & клиент                    & сегмент                   & потребитель           \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\noindent \textbf{Anchor words for unigram anchor model}: \emph{москва}, \emph{налоговый}, \emph{история}, \emph{акция}, \emph{сила}, \emph{платеж}, \emph{ассоциация}
+	
+	
+	\noindent \textbf{Anchor words for bigram anchor models}: \emph{компания}, \textbf{\emph{миллион рубль}}, \textbf{\emph{страна ес}}, \emph{управление},  \textbf{\emph{юридический лицо}}, \textbf{\emph{российский федерация}}
+	\begin{table}[H]
+		\centering
+		\caption{Examples of topics for the NIPS collection}
+		\label{tab:nips}
+		\begin{tabular}{|l|l|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|l|}{\textbf{~~~~~~~~PLSA}}           & \multicolumn{2}{l|}{\textbf{~~~~~~~~ANW}}             & \multicolumn{2}{l|}{\textbf{~ANW+ PLSA + BI}}         \\ \hline
+			\textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} & \textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} & \textit{\textbf{Topic 1}} & \textit{\textbf{Topic 2}} \\ \hline
+			neuron                    & tree                      & neuron                    & tree                      & synaps                    & tree                      \\
+			spike                     & featur                    & synaps                    & decis                     & synapt                    & decis                     \\
+			fire                      & branch                    & synapt                    & branch                    & neuron                    & branch                    \\
+			time                      & thi                       & input                     & structur                  & hebbian                   & set                       \\
+			synapt                    & class                     & pattern                   & leaf                      & postsynapt                & probabl                   \\
+			synaps                    & imag                      & neural                    & prune                     & pattern                   & prune                     \\
+			rate                      & object                    & activ                     & set                       & function                  & algorithm                 \\
+			input                     & decis                     & connect                   & probabl                   & activ                     & leaf                      \\ \hline
+		\end{tabular}
+	\end{table}
+	
+	\noindent \textbf{Anchor words for unigram anchor model}: \emph{face}, \emph{charact}, \emph{fire}, \emph{loss}, \emph{motion}, \emph{cluster}, \emph{tree}, \emph{circuit}, \emph{trajectori}, \emph{word}, \emph{extra}, \emph{action}, \emph{mixtur}
+	
+	\noindent \textbf{Anchor words for bigram anchor model}: \emph{likelihood}, \emph{network}, \emph{loss}, \emph{face}, \textbf{\emph{ocular domain}}, \textbf{\emph{reinforc learn}}, \textbf{\emph{optic flow}}, \textbf{\emph{boltzmann machin}}, \emph{markov}
+
+	\section{Conclusion}
+	We propose a modification of the Anchor Words topic modeling algorithm that takes into account collocations. The experiments have confirmed that this approach leads to the increase of the interpretability without deteriorating perplexity. 
+	
+	Accounting of collocations is only the first step to add linguistic information into  a topic model. Further work will focus on the study of the possibilities of using the sentence structure of a text, as well as the morphological structure of words in the construction of topic models.
+    \bigskip
+    \subsubsection*{Acknowledgments.}
+	This work was supported by grant RFFI 14-07-00383A <<Research of methods of integration of linguistic knowledge into statistical topic models>>.
+	\bibliography{typeinst}{}
+	\bibliographystyle{splncs}
+	
+\end{document}

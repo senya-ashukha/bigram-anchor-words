@@ -1,0 +1,10 @@
+iter 00: preplexity train = 1636.15, test = 1847.35 coherence = mean 1.04 median 0.71 uniq_top_of_topics = 0.60
+iter 01: preplexity train = 1623.73, test = 1839.85 coherence = mean 1.10 median 0.84 uniq_top_of_topics = 0.62
+iter 02: preplexity train = 1619.39, test = 1839.92 coherence = mean 1.11 median 0.84 uniq_top_of_topics = 0.62
+iter 03: preplexity train = 1619.32, test = 1843.51 coherence = mean 1.12 median 0.84 uniq_top_of_topics = 0.63
+iter 04: preplexity train = 1621.52, test = 1848.64 coherence = mean 1.14 median 0.87 uniq_top_of_topics = 0.63
+iter 05: preplexity train = 1624.96, test = 1854.40 coherence = mean 1.18 median 0.91 uniq_top_of_topics = 0.64
+iter 06: preplexity train = 1628.97, test = 1860.25 coherence = mean 1.17 median 0.91 uniq_top_of_topics = 0.64
+iter 07: preplexity train = 1633.19, test = 1865.96 coherence = mean 1.17 median 0.92 uniq_top_of_topics = 0.63
+iter 08: preplexity train = 1637.52, test = 1871.52 coherence = mean 1.18 median 0.97 uniq_top_of_topics = 0.63
+iter 09: preplexity train = 1641.92, test = 1876.87 coherence = mean 1.19 median 1.01 uniq_top_of_topics = 0.63

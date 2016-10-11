@@ -1,0 +1,1 @@
+end: preplexity train = 2099.08, test = 2330.34 coherence = mean 0.94 median 0.63 uniq_top_of_topics = 0.53
