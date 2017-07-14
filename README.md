@@ -1,38 +1,38 @@
-# About
+# Bigram Anchor Words Topic Model
 
-Bag of words, very poor representation of the text, since a lot of information is lost when it was built. The main objective of the project is the integration of linguistic knowledge in statistical topic model. 
-We had modified Anchor Words Topic Model [1] to take into account word collocation, the result is published un conference paper [2]. 
+Implementation for the [Bigram Anchor Words Topic Model](https://link.springer.com/chapter/10.1007/978-3-319-52920-2_12)paper. 
+Bag of words is very poor text representation, since that, in traditional topic models, we are losing a lot of information. 
+The project goal is to combine linguistic with statistical topic models. 
+We propose new Anchor Words Topic Model [1] such as bigrams also could be anchor words.
 
-* [1] Sanjeev A., Rong G.: A Practical Algorithm for Topic Modeling with Provable Guarantees (NIPS, 2012) 
-* [2] Ashuha A., Loukachevitch N.: Bigramm Anchor Words Topic Model (AIST, 2016)
+[1] Sanjeev A., Rong G.: A Practical Algorithm for Topic Modeling with Provable Guarantees (NIPS, 2012) 
+
+# Results
+
+<p align="center">
+<img height="318" src="/pres/anchors.png"/>
+</p>
+
 
 # Experiments 
 
-To repeat published result, you should run flow commands  
+You could use following code to repeat published results. A simple way to repeat experiments is to try to understand examples =) I'm sorry that documentation is absent.  
 
 ```bash
 cd bigram-anchor-words
 ipython ./examples/{corpus}/{model}.py
 ```
 
-# Code yourself experiment 
+# Citation
 
-Simple way to repeat experiments is try to understand examples =) I'm really sorry that documentation is absent.  
+If you found this code useful please cite our paper
 
+@inproceedings{ashuha2016bigram,
+  title={Bigram Anchor Words Topic Model},
+  author={Ashuha, Arseniy and Loukachevitch, Natalia},
+  booktitle={International Conference on Analysis of Images, Social Networks and Texts},
+  pages={121--131},
+  year={2016},
+  organization={Springer}
+}
 
-```python
-from tmtk.topic_models import plsa
-
-from tmtk.metrics.metrics import preplexity, coherence, uniq_top_of_topics
-from tmtk.collection.collection import FullTextCollection
-
-collection = FullTextCollection(path='./tmtk/corpa/20np.zip', lang='ru').fill()
-
-F, T = plsa.plsa_model(
-    collection,
-    wrd_count=len(collection.id_to_words),
-    metrics=[preplexity, coherence, uniq_top_of_topics],
-    num_iter=100, verbose=True)
-
-plsa.print_topics(F, collection.id_to_words, 'en_20np/pl.txt')
-```
