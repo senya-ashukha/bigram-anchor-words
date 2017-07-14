@@ -1,6 +1,6 @@
 # Bigram Anchor Words Topic Model
 
-Implementation for the [Bigram Anchor Words Topic Model](https://link.springer.com/chapter/10.1007/978-3-319-52920-2_12)paper. 
+Implementation for the [Bigram Anchor Words Topic Model](https://link.springer.com/chapter/10.1007/978-3-319-52920-2_12) paper. 
 Bag of words is very poor text representation, since that, in traditional topic models, we are losing a lot of information. 
 The project goal is to combine linguistic with statistical topic models. 
 We propose new Anchor Words Topic Model [1] such as bigrams also could be anchor words.
