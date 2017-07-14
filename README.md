@@ -28,6 +28,7 @@ ipython ./examples/{corpus}/{model}.py
 
 If you found this code useful please cite our paper
 
+```
 @inproceedings{ashuha2016bigram,
   title={Bigram Anchor Words Topic Model},
   author={Ashuha, Arseniy and Loukachevitch, Natalia},
@@ -36,4 +37,4 @@ If you found this code useful please cite our paper
   year={2016},
   organization={Springer}
 }
-
+```
