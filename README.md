@@ -9,7 +9,7 @@ We propose new Anchor Words Topic Model [1] such as bigrams also could be anchor
 
 # Results
 
-Here are Examples of anchor words from vanilla and our modelw. 
+Here are an example of anchor words. 
 Metrics are also good and could be found in the paper.
 <p align="center">
 <img height="318" src="http://ars-ashuha.ru/images/anchors.png"/>
